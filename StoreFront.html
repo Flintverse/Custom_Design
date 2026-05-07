@@ -57,6 +57,18 @@
     .product-card.zoom-enabled:hover .product-image {
       transform: scale(1.05);
     }
+
+    /* SKU preview styles (matches settings layout) */
+    .sku-preview-container {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
+    .sku-preview-label,
+    .sku-preview-code {
+      font-weight: inherit;
+    }
     
     /* Badge base styles - FIXED: Better positioning system */
     .preview-badge {
@@ -237,6 +249,9 @@
 
         <!-- Right Icons -->
         <div class="flex items-center gap-4">
+          <a href="index.html" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-gray-700 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors">
+            <i class="fas fa-sliders-h text-xs"></i> Back to Settings
+          </a>
           <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all">
             <i class="fas fa-search text-lg"></i>
           </button>
@@ -996,6 +1011,7 @@
     
     // Filter bar defaults
     filterBarBg: '#ffffff',
+    filterBarWidth: '256',
     optLabelFont: "'Inter', sans-serif",
     optLabelSize: '14',
     optLabelColor: '#111827',
@@ -1015,7 +1031,30 @@
     btnRadius: '8',
     
     // Sticky filter
-    stickyFilter: false
+    stickyFilter: false,
+
+    // SKU defaults
+    showSku: true,
+    skuDisplayMode: 'full',
+    skuFontFull: "'Inter', sans-serif",
+    skuLabelSize: '11',
+    skuLabelColor: '#6b7280',
+    skuLabelBg: '#f3f4f6',
+    skuLabelWeight: '400',
+    skuCodeSize: '12',
+    skuCodeColor: '#111827',
+    skuCodeBg: '#ffffff',
+    skuCodeWeight: '400',
+    skuTransformFull: 'none',
+    skuFontCodeOnly: "'Inter', sans-serif",
+    skuCodeOnlySize: '12',
+    skuCodeOnlyColor: '#111827',
+    skuCodeOnlyBg: '#ffffff',
+    skuCodeOnlyWeight: '400',
+    skuTransformCodeOnly: 'none',
+
+    // Element order
+    elementOrder: ['title', 'sku', 'vendor', 'rating', 'review', 'price']
   };
 
   /**
@@ -1059,6 +1098,7 @@
     
     // Each Product Card
     document.querySelectorAll('.product-card').forEach(card => {
+      ensureCardStructure(card);
       applyCardStyles(card, c);
       applyBadges(card, c); // FIX #1: Improved badge positioning
       applyWishlistButton(card, c);
@@ -1111,9 +1151,20 @@
    */
   function applyFilterSidebar(c) {
     const panel = document.getElementById('filter-panel');
+    const sidebar = document.getElementById('filter-sidebar');
     
     if (panel && c.filterBarBg) {
       panel.style.backgroundColor = c.filterBarBg;
+    }
+
+    if (c.filterBarWidth) {
+      const widthValue = c.filterBarWidth + 'px';
+      panel.style.width = widthValue;
+      panel.style.minWidth = widthValue;
+      panel.style.maxWidth = widthValue;
+      if (sidebar) {
+        sidebar.style.width = widthValue;
+      }
     }
     
     // Filter headers (option labels)
@@ -1236,6 +1287,9 @@
       if (c.titleTransform) title.style.textTransform = c.titleTransform;
     }
     
+    // SKU
+    applySkuDisplay(card, c);
+
     // VENDOR
     const vendor = card.querySelector('.product-vendor');
     if (vendor) {
@@ -1247,16 +1301,17 @@
       if (c.vendorTransform) vendor.style.textTransform = c.vendorTransform;
     }
     
-    // RATING
+    // RATING + REVIEW
+    const ratingSection = card.querySelector('[data-section="rating"]');
+    const reviewSection = card.querySelector('[data-section="review"]');
     const ratingContainer = card.querySelector('.rating-container');
+    if (ratingSection) {
+      ratingSection.style.display = c.showRating ? '' : 'none';
+    }
+    if (reviewSection) {
+      reviewSection.style.display = (c.showRating && c.showReviewCount) ? '' : 'none';
+    }
     if (ratingContainer) {
-      ratingContainer.style.display = c.showRating ? '' : 'none';
-      
-      // Review count
-      const reviewCount = card.querySelector('.review-count');
-      if (reviewCount) reviewCount.style.display = c.showReviewCount ? '' : 'none';
-      
-      // Star vs text
       const stars = card.querySelector('.stars');
       if (stars && c.ratingType === 'text') {
         stars.innerHTML = '<span class="text-gray-700 font-semibold text-xs">4.5/5</span>';
@@ -1327,6 +1382,159 @@
     const qvInline = card.querySelector('.qv-inline');
     if (qvInline) {
       qvInline.style.display = (c.showQuickView && c.quickViewPosition === 'in-card') ? '' : 'none';
+    }
+
+    applyElementOrder(card, c);
+  }
+
+  function ensureCardStructure(card) {
+    if (card.dataset.structureApplied === 'true') return;
+
+    const content = card.querySelector('.product-content');
+    if (!content) return;
+
+    const title = content.querySelector('.product-title');
+    const vendor = content.querySelector('.product-vendor');
+    const rating = content.querySelector('.rating-container');
+    const reviewCount = content.querySelector('.review-count');
+    const price = content.querySelector('.price-block');
+    let actions = content.querySelector('.actions-row');
+    if (!actions) {
+      const actionButtons = content.querySelectorAll('.atc-btn, .wish-inline, .qv-inline');
+      if (actionButtons.length) {
+        actions = document.createElement('div');
+        actions.className = 'actions-row flex gap-2';
+        actionButtons.forEach(btn => actions.appendChild(btn));
+      }
+    }
+
+    // Detach review count so it can be its own section
+    if (reviewCount && reviewCount.parentElement === rating) {
+      reviewCount.remove();
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    const wrapSection = (key, el) => {
+      if (!el) return null;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'content-section';
+      wrapper.dataset.section = key;
+      wrapper.appendChild(el);
+      return wrapper;
+    };
+
+    const titleWrap = wrapSection('title', title);
+
+    const skuWrap = document.createElement('div');
+    skuWrap.className = 'content-section';
+    skuWrap.dataset.section = 'sku';
+    const skuInner = document.createElement('div');
+    skuInner.className = 'sku-preview-container';
+    skuWrap.appendChild(skuInner);
+
+    const vendorWrap = wrapSection('vendor', vendor);
+    const ratingWrap = wrapSection('rating', rating);
+
+    const reviewWrap = document.createElement('div');
+    reviewWrap.className = 'content-section';
+    reviewWrap.dataset.section = 'review';
+    if (reviewCount) {
+      reviewWrap.appendChild(reviewCount);
+    }
+
+    const priceWrap = wrapSection('price', price);
+
+    [titleWrap, skuWrap, vendorWrap, ratingWrap, reviewWrap, priceWrap].forEach(section => {
+      if (section) fragment.appendChild(section);
+    });
+
+    content.innerHTML = '';
+    content.appendChild(fragment);
+    if (actions) content.appendChild(actions);
+
+    card.dataset.structureApplied = 'true';
+  }
+
+  function applyElementOrder(card, c) {
+    const content = card.querySelector('.product-content');
+    if (!content) return;
+
+    const actions = content.querySelector('.actions-row');
+    if (actions) actions.remove();
+
+    const order = Array.isArray(c.elementOrder) && c.elementOrder.length
+      ? c.elementOrder
+      : ['title', 'sku', 'vendor', 'rating', 'review', 'price'];
+
+    const sections = {};
+    content.querySelectorAll('.content-section').forEach(section => {
+      const key = section.dataset.section;
+      if (key) sections[key] = section;
+    });
+
+    order.forEach(key => {
+      if (sections[key]) content.appendChild(sections[key]);
+    });
+
+    if (actions) content.appendChild(actions);
+  }
+
+  function applySkuDisplay(card, c) {
+    const skuSection = card.querySelector('[data-section="sku"]');
+    if (!skuSection) return;
+
+    const skuContainer = skuSection.querySelector('.sku-preview-container');
+    if (!skuContainer) return;
+
+    if (!c.showSku) {
+      skuSection.style.display = 'none';
+      skuContainer.innerHTML = '';
+      return;
+    }
+
+    skuSection.style.display = '';
+    const code = card.dataset.sku || 'TS-ES-2024-BLK';
+    const mode = c.skuDisplayMode || 'full';
+    const align = c.contentAlign || 'left';
+    skuContainer.style.justifyContent = align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start';
+
+    if (mode === 'full') {
+      skuContainer.innerHTML = `
+        <span class="sku-preview-label" style="
+          font-family: ${c.skuFontFull || 'inherit'};
+          font-size: ${(c.skuLabelSize || '11')}px;
+          color: ${c.skuLabelColor || '#6b7280'};
+          background: ${c.skuLabelBg || '#f3f4f6'};
+          font-weight: ${c.skuLabelWeight || '400'};
+          text-transform: ${c.skuTransformFull || 'none'};
+          padding: 1px 5px;
+          border-radius: 3px;
+        ">SKU:</span>
+        <span class="sku-preview-code" style="
+          font-family: ${c.skuFontFull || 'inherit'};
+          font-size: ${(c.skuCodeSize || '12')}px;
+          color: ${c.skuCodeColor || '#111827'};
+          background: ${c.skuCodeBg || '#ffffff'};
+          font-weight: ${c.skuCodeWeight || '400'};
+          text-transform: ${c.skuTransformFull || 'none'};
+          padding: 1px 5px;
+          border-radius: 3px;
+        ">${code}</span>
+      `;
+    } else {
+      skuContainer.innerHTML = `
+        <span class="sku-preview-code" style="
+          font-family: ${c.skuFontCodeOnly || 'inherit'};
+          font-size: ${(c.skuCodeOnlySize || '12')}px;
+          color: ${c.skuCodeOnlyColor || '#111827'};
+          background: ${c.skuCodeOnlyBg || '#ffffff'};
+          font-weight: ${c.skuCodeOnlyWeight || '400'};
+          text-transform: ${c.skuTransformCodeOnly || 'none'};
+          padding: 1px 6px;
+          border-radius: 3px;
+        ">${code}</span>
+      `;
     }
   }
 
