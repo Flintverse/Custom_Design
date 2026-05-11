@@ -119,6 +119,60 @@
       padding: 0 5px; border-radius: 10px; margin-left: auto; min-width: 18px; text-align: center;
     }
 
+    .filter-preview-horizontal #filter-preview-sections {
+      display: grid;
+      grid-template-columns: repeat(var(--filter-columns, 3), minmax(0, 1fr));
+      gap: var(--filter-gap, 10px);
+    }
+
+    .filter-preview-horizontal #filter-preview-header-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-preview-horizontal #filter-preview-title {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .filter-preview-horizontal .filter-preview-section {
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
+    .filter-preview-horizontal [id^="preview-opt-label"] {
+      display: none;
+    }
+
+    .filter-preview-horizontal .filter-preview-values {
+      display: none;
+    }
+
+    .filter-preview-select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      padding: 0.35rem 0.5rem;
+      background: white;
+      display: none;
+      min-width: 0;
+    }
+
+    .filter-preview-select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1.5px rgba(37,99,235,0.15);
+    }
+
+    .filter-preview-horizontal .filter-preview-select {
+      display: block;
+    }
+
+    .filter-preview-horizontal #filter-preview-footer {
+      grid-column: 1 / -1;
+    }
+
     /* Extra spacing for all sections */
     #grid-tab .config-box { margin-bottom: 1.25rem; }
     #filter-tab .config-box { margin-bottom: 1.25rem; }
@@ -471,23 +525,34 @@
           <h2 class="section-title mb-1">Filter Layout</h2>
           <p class="text-[11px] text-gray-500 mb-2">Choose your preferred filter layout style</p>
           <div class="grid grid-cols-4 gap-2.5">
-            <div onclick="selectLayout(this)" class="option-card rounded-lg p-2.5 bg-white border border-gray-200">
+            <div onclick="selectLayout(this)" data-layout="vertical" class="option-card rounded-lg p-2.5 bg-white border border-gray-200">
               <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="desktop" class="w-3 h-3 accent-blue-600"><span class="text-[11px] font-medium">Vertical</span></div>
               <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex"><div class="w-14 bg-blue-200/70 rounded"></div></div>
             </div>
-            <div onclick="selectLayout(this)" class="option-card rounded-lg p-2.5 bg-white border border-gray-200">
+            <div onclick="selectLayout(this)" data-layout="offcanvas-mobile" class="option-card rounded-lg p-2.5 bg-white border border-gray-200">
               <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="desktop" class="w-3 h-3 accent-blue-600"><span class="text-[11px] font-medium leading-tight">Off-Canvas<br>(Mobile)</span></div>
               <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex"><div class="w-4 bg-blue-200/70 rounded"></div></div>
             </div>
-            <div onclick="selectLayout(this)" class="option-card selected rounded-lg p-2.5 bg-white border border-gray-200">
+            <div onclick="selectLayout(this)" data-layout="offcanvas-desktop" class="option-card selected rounded-lg p-2.5 bg-white border border-gray-200">
               <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="desktop" checked class="w-3 h-3 accent-blue-600"><span class="text-[11px] font-medium leading-tight">Off-Canvas<br>(Desktop)</span></div>
               <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex"><div class="w-6 bg-blue-200/70 rounded"></div></div>
             </div>
-            <div onclick="selectLayout(this)" class="option-card rounded-lg p-2.5 bg-white border border-gray-200">
+            <div onclick="selectLayout(this)" data-layout="horizontal" class="option-card rounded-lg p-2.5 bg-white border border-gray-200">
               <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="desktop" class="w-3 h-3 accent-blue-600"><span class="text-[11px] font-medium">Horizontal</span></div>
               <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex flex-col"><div class="flex gap-0.5"><div class="flex-1 h-4 bg-blue-200/70 rounded"></div></div></div>
             </div>
           </div>
+          <div id="horizontal-columns-row" class="ctrl-row hidden mt-3">
+            <label>Horizontal Columns</label>
+            <select id="horizontal-columns" class="micro-select w-24">
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+          <input type="hidden" id="filter-layout" value="offcanvas-desktop">
         </div>
         <!-- Filter Bar -->
         <div class="config-box">
@@ -666,109 +731,295 @@
         <div class="preview-sticky config-box shadow-md">
           <h3 class="section-title mb-2 pb-1.5 border-b border-gray-100">Live Preview</h3>
           <div id="filter-preview-panel" class="border border-gray-200 rounded-lg p-3.5 min-h-[450px] flex flex-col overflow-auto transition-all duration-300" style="background:#ffffff;">
-            <div class="text-blue-600 text-[11px] font-bold mb-2.5 tracking-wide uppercase">Filters</div>
-           
-            <div class="mb-3.5">
-              <div id="preview-opt-label-1" class="text-[13px] font-semibold mb-1.5">Category</div>
-              <div class="space-y-1.2">
-                <label class="flex items-center gap-1.5 cursor-pointer group">
-                  <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span id="preview-val-1" class="text-[13px] flex-1">T-Shirts</span>
-                  <span class="count-badge">24</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer group">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span id="preview-val-2" class="text-[13px] flex-1">Hoodies</span>
-                  <span class="count-badge">12</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer group">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">Jackets</span>
-                  <span class="count-badge">8</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer group">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">Pants</span>
-                  <span class="count-badge">31</span>
-                </label>
+            <div id="filter-preview-header-row" class="mb-2.5">
+              <div id="filter-preview-title" class="text-blue-600 text-[11px] font-bold tracking-wide uppercase">Filters</div>
+              <div id="filter-preview-sections">
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-1" class="text-[13px] font-semibold mb-1.5">Category</div>
+                <select class="filter-preview-select" aria-label="Category">
+                  <option selected disabled>Category</option>
+                  <option>T-Shirts</option>
+                  <option>Hoodies</option>
+                  <option>Jackets</option>
+                  <option>Pants</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer group">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-1" class="text-[13px] flex-1">T-Shirts</span>
+                    <span class="count-badge">24</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-2" class="text-[13px] flex-1">Hoodies</span>
+                    <span class="count-badge">12</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Jackets</span>
+                    <span class="count-badge">8</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Pants</span>
+                    <span class="count-badge">31</span>
+                  </label>
+                </div>
               </div>
-            </div>
-           
-            <div class="mb-3.5">
-              <div id="preview-opt-label-2" class="text-[13px] font-semibold mb-1.5">Price Range</div>
-              <div class="space-y-1.2">
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span id="preview-val-4" class="text-[13px] flex-1">$0 — $50</span>
-                  <span class="count-badge">45</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span id="preview-val-5" class="text-[13px] flex-1">$50 — $150</span>
-                  <span class="count-badge">67</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">$150 — $300</span>
-                  <span class="count-badge">23</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">$300+</span>
-                  <span class="count-badge">11</span>
-                </label>
+             
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-2" class="text-[13px] font-semibold mb-1.5">Price Range</div>
+                <select class="filter-preview-select" aria-label="Price Range">
+                  <option selected disabled>Price Range</option>
+                  <option>$0 — $50</option>
+                  <option>$50 — $150</option>
+                  <option>$150 — $300</option>
+                  <option>$300+</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-4" class="text-[13px] flex-1">$0 — $50</span>
+                    <span class="count-badge">45</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-5" class="text-[13px] flex-1">$50 — $150</span>
+                    <span class="count-badge">67</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">$150 — $300</span>
+                    <span class="count-badge">23</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">$300+</span>
+                    <span class="count-badge">11</span>
+                  </label>
+                </div>
               </div>
-            </div>
-           
-            <div class="mb-3.5">
-              <div id="preview-opt-label-3" class="text-[13px] font-semibold mb-1.5">Color</div>
-              <div class="space-y-1.2">
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span id="preview-val-6" class="text-[13px] flex-1">Black</span>
-                  <span class="count-badge">89</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span id="preview-val-7" class="text-[13px] flex-1">White</span>
-                  <span class="count-badge">56</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">Navy</span>
-                  <span class="count-badge">34</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">Red</span>
-                  <span class="count-badge">19</span>
-                </label>
+             
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-3" class="text-[13px] font-semibold mb-1.5">Color</div>
+                <select class="filter-preview-select" aria-label="Color">
+                  <option selected disabled>Color</option>
+                  <option>Black</option>
+                  <option>White</option>
+                  <option>Navy</option>
+                  <option>Red</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-6" class="text-[13px] flex-1">Black</span>
+                    <span class="count-badge">89</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-7" class="text-[13px] flex-1">White</span>
+                    <span class="count-badge">56</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Navy</span>
+                    <span class="count-badge">34</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Red</span>
+                    <span class="count-badge">19</span>
+                  </label>
+                </div>
               </div>
-            </div>
-            <div class="mb-3.5">
-              <div class="text-[13px] font-semibold mb-1.5">Brand</div>
-              <div class="space-y-1.2">
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">Nike</span>
-                  <span class="count-badge">42</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">Adidas</span>
-                  <span class="count-badge">38</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                  <span class="text-[13px] flex-1">Puma</span>
-                  <span class="count-badge">27</span>
-                </label>
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-4" class="text-[13px] font-semibold mb-1.5">Size</div>
+                <select class="filter-preview-select" aria-label="Size">
+                  <option selected disabled>Size</option>
+                  <option>Small</option>
+                  <option>Medium</option>
+                  <option>Large</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-8" class="text-[13px] flex-1">Small</span>
+                    <span class="count-badge">18</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-9" class="text-[13px] flex-1">Medium</span>
+                    <span class="count-badge">26</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Large</span>
+                    <span class="count-badge">22</span>
+                  </label>
+                </div>
               </div>
-            </div>
-           
-            <div class="mt-auto pt-2">
-              <button id="preview-btn" class="w-full py-2 text-[13px] font-semibold rounded-lg transition-all">Apply Filters</button>
-              <div id="filter-status" class="text-[11px] text-gray-400 mt-1.5 text-center h-3"></div>
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-5" class="text-[13px] font-semibold mb-1.5">Brand</div>
+                <select class="filter-preview-select" aria-label="Brand">
+                  <option selected disabled>Brand</option>
+                  <option>Nike</option>
+                  <option>Adidas</option>
+                  <option>Puma</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-10" class="text-[13px] flex-1">Nike</span>
+                    <span class="count-badge">42</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Adidas</span>
+                    <span class="count-badge">38</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Puma</span>
+                    <span class="count-badge">27</span>
+                  </label>
+                </div>
+              </div>
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-6" class="text-[13px] font-semibold mb-1.5">Material</div>
+                <select class="filter-preview-select" aria-label="Material">
+                  <option selected disabled>Material</option>
+                  <option>Cotton</option>
+                  <option>Linen</option>
+                  <option>Blend</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-11" class="text-[13px] flex-1">Cotton</span>
+                    <span class="count-badge">34</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-12" class="text-[13px] flex-1">Linen</span>
+                    <span class="count-badge">15</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Blend</span>
+                    <span class="count-badge">21</span>
+                  </label>
+                </div>
+              </div>
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-7" class="text-[13px] font-semibold mb-1.5">Style</div>
+                <select class="filter-preview-select" aria-label="Style">
+                  <option selected disabled>Style</option>
+                  <option>Classic</option>
+                  <option>Sport</option>
+                  <option>Street</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-13" class="text-[13px] flex-1">Classic</span>
+                    <span class="count-badge">28</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Sport</span>
+                    <span class="count-badge">17</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Street</span>
+                    <span class="count-badge">22</span>
+                  </label>
+                </div>
+              </div>
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-8" class="text-[13px] font-semibold mb-1.5">Fit</div>
+                <select class="filter-preview-select" aria-label="Fit">
+                  <option selected disabled>Fit</option>
+                  <option>Slim</option>
+                  <option>Regular</option>
+                  <option>Relaxed</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-14" class="text-[13px] flex-1">Slim</span>
+                    <span class="count-badge">12</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Regular</span>
+                    <span class="count-badge">31</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Relaxed</span>
+                    <span class="count-badge">9</span>
+                  </label>
+                </div>
+              </div>
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-9" class="text-[13px] font-semibold mb-1.5">Sleeve</div>
+                <select class="filter-preview-select" aria-label="Sleeve">
+                  <option selected disabled>Sleeve</option>
+                  <option>Short</option>
+                  <option>Long</option>
+                  <option>Sleeveless</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-15" class="text-[13px] flex-1">Short</span>
+                    <span class="count-badge">29</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Long</span>
+                    <span class="count-badge">13</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Sleeveless</span>
+                    <span class="count-badge">6</span>
+                  </label>
+                </div>
+              </div>
+              <div class="filter-preview-section mb-3.5">
+                <div id="preview-opt-label-10" class="text-[13px] font-semibold mb-1.5">Pattern</div>
+                <select class="filter-preview-select" aria-label="Pattern">
+                  <option selected disabled>Pattern</option>
+                  <option>Solid</option>
+                  <option>Stripe</option>
+                  <option>Graphic</option>
+                </select>
+                <div class="filter-preview-values space-y-1.2">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span id="preview-val-16" class="text-[13px] flex-1">Solid</span>
+                    <span class="count-badge">40</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Stripe</span>
+                    <span class="count-badge">11</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
+                    <span class="text-[13px] flex-1">Graphic</span>
+                    <span class="count-badge">14</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div id="filter-preview-footer" class="mt-auto pt-2">
+                <button id="preview-btn" class="w-full py-2 text-[13px] font-semibold rounded-lg transition-all">Apply Filters</button>
+                <div id="filter-status" class="text-[11px] text-gray-400 mt-1.5 text-center h-3"></div>
+              </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1773,12 +2024,32 @@ function selectLayout(el) {
   el.classList.add('selected');
   const radio = el.querySelector('input[type="radio"]');
   if(radio) radio.checked = true;
+
+  const layout = el.dataset.layout || 'offcanvas-desktop';
+  const layoutInput = document.getElementById('filter-layout');
+  if (layoutInput) layoutInput.value = layout;
+
+  const columnsRow = document.getElementById('horizontal-columns-row');
+  if (columnsRow) columnsRow.classList.toggle('hidden', layout !== 'horizontal');
+
+  updateFilterPreview();
+  debouncedAutoSave();
 }
 
 // ==================== FILTER PREVIEW ====================
 function updateFilterPreview() {
   const panel = document.getElementById('filter-preview-panel');
   panel.style.backgroundColor = document.getElementById('filter-bar-bg').value;
+
+  const layout = document.getElementById('filter-layout')?.value || 'offcanvas-desktop';
+  const columns = document.getElementById('horizontal-columns')?.value || '3';
+  panel.classList.toggle('filter-preview-horizontal', layout === 'horizontal');
+  panel.style.setProperty('--filter-columns', columns);
+  const gapMap = { '2': '24px', '3': '16px', '4': '12px', '5': '10px', '6': '8px' };
+  panel.style.setProperty('--filter-gap', gapMap[columns] || '12px');
+
+  const previewTitle = document.getElementById('filter-preview-title');
+  if (previewTitle) previewTitle.textContent = layout === 'horizontal' ? 'Filter by:' : 'Filters';
   
   // Apply filter bar width
   const barWidth = document.getElementById('filter-bar-width').value;
@@ -2635,6 +2906,8 @@ function collectAllSettings() {
     filterBarBg: getVal('filter-bar-bg'),
     filterBarWidth: getVal('filter-bar-width'),
     stickyFilter: getVal('sticky-filter'),
+    filterLayout: getVal('filter-layout'),
+    horizontalColumns: getVal('horizontal-columns'),
     
     // ===== FILTER OPTION LABELS =====
     optLabelFont: getVal('opt-font'),
@@ -2733,6 +3006,9 @@ window.onload = () => {
   initFontSelects();
   setupSliders();
   initDragAndDrop();
+
+  const initialLayoutCard = document.querySelector('#filter-tab .option-card.selected');
+  if (initialLayoutCard) selectLayout(initialLayoutCard);
   
   // Attach original preview updaters
   document.querySelectorAll('#filter-tab input, #filter-tab select').forEach(el => {
