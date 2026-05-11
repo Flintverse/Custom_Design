@@ -58,6 +58,20 @@
       transform: scale(1.05);
     }
 
+    .product-card.second-image-enabled .product-image-secondary {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-card.second-image-enabled:hover .product-image-secondary {
+      opacity: 1;
+    }
+
     /* SKU preview styles (matches settings layout) */
     .sku-preview-container {
       display: flex;
@@ -148,6 +162,24 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
+
+    .filter-select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 0.45rem 0.7rem;
+      font-size: 0.85rem;
+      background: white;
+      color: #374151;
+      display: none;
+      min-width: 0;
+    }
+
+    .filter-select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1.5px rgba(37,99,235,0.15);
+      outline: none;
+    }
     
     /* Active filter tag */
     .active-filter-tag {
@@ -215,6 +247,55 @@
       top: 80px;
     }
 
+    .filter-title-row {
+      display: block;
+    }
+
+    /* Horizontal filter layout */
+    #filter-panel.filter-horizontal {
+      width: 100% !important;
+      max-height: none;
+      overflow: visible;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+    #filter-panel.filter-horizontal .filter-title-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    #filter-panel.filter-horizontal #filter-title {
+      margin-bottom: 0;
+      white-space: nowrap;
+    }
+    #filter-panel.filter-horizontal .filter-sections {
+      display: grid;
+      grid-template-columns: repeat(var(--filter-columns, 3), minmax(0, 1fr));
+      gap: var(--filter-gap, 16px);
+    }
+    #filter-panel.filter-horizontal .filter-section {
+      min-width: 0;
+      margin-bottom: 0;
+    }
+    #filter-panel.filter-horizontal .filter-header {
+      display: none;
+    }
+    #filter-panel.filter-horizontal .filter-divider {
+      display: none;
+    }
+    #filter-panel.filter-horizontal .filter-apply-row {
+      grid-column: 1 / -1;
+      margin-top: 6px;
+    }
+    #filter-panel.filter-horizontal .filter-values-list {
+      display: none;
+    }
+    #filter-panel.filter-horizontal .filter-select {
+      display: block;
+    }
+
     /* Sold out overlay */
     .sold-out-overlay {
       position: absolute;
@@ -277,122 +358,321 @@
 
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div id="filter-horizontal-wrapper" class="hidden mb-6"></div>
     <div class="flex gap-8">
       
       <!-- ============ LEFT SIDEBAR: FILTERS ============ -->
       <aside id="filter-sidebar" class="w-64 flex-shrink-0 hidden lg:block">
         <div id="filter-panel" class="bg-white rounded-lg border border-gray-200 p-5 max-h-[calc(100vh-120px)] overflow-y-auto filter-scroll">
-          <h2 id="filter-title" class="text-base font-bold text-gray-900 mb-4">Filter by</h2>
-          
-          <!-- Availability Filter -->
-          <div class="mb-6 filter-section">
-            <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
-              <span>Availability</span>
-              <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
-            </button>
-            <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-              <input type="checkbox" class="custom-checkbox">
-              <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">Out of Stock</span>
-              <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
-            </label>
-          </div>
+          <div class="filter-title-row">
+            <h2 id="filter-title" class="text-base font-bold text-gray-900 mb-4">Filter by:</h2>
+            <div id="filter-sections" class="filter-sections">
+            <!-- Availability Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Availability</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Availability">
+                <option selected disabled>Availability</option>
+                <option>In Stock</option>
+                <option>Out of Stock</option>
+              </select>
+              <div class="filter-values-list">
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="checkbox" class="custom-checkbox">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">Out of Stock</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
+                </label>
+              </div>
+            </div>
 
-          <hr class="border-gray-200 my-5">
+            <hr class="filter-divider border-gray-200 my-5">
 
-          <!-- Price Range Filter -->
-          <div class="mb-6 filter-section">
-            <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
-              <span>Price</span>
-              <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
-            </button>
-            <div class="px-1">
-              <input type="range" min="0" max="500" value="170" class="range-slider w-full mb-3">
-              <div class="flex items-center gap-3">
-                <div class="flex-1">
-                  <label class="text-xs text-gray-500 mb-1 block">From ($)</label>
-                  <input type="number" value="170" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none">
-                </div>
-                <div class="flex-1">
-                  <label class="text-xs text-gray-500 mb-1 block">To ($)</label>
-                  <input type="number" value="170" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none">
+            <!-- Price Range Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Price</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Price">
+                <option selected disabled>Price</option>
+                <option>$0 — $50</option>
+                <option>$50 — $150</option>
+                <option>$150 — $300</option>
+                <option>$300+</option>
+              </select>
+              <div class="filter-values-list px-1">
+                <input type="range" min="0" max="500" value="170" class="range-slider w-full mb-3">
+                <div class="flex items-center gap-3">
+                  <div class="flex-1">
+                    <label class="text-xs text-gray-500 mb-1 block">From ($)</label>
+                    <input type="number" value="170" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none">
+                  </div>
+                  <div class="flex-1">
+                    <label class="text-xs text-gray-500 mb-1 block">To ($)</label>
+                    <input type="number" value="170" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none">
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <hr class="border-gray-200 my-5">
+            <hr class="filter-divider border-gray-200 my-5">
 
-          <!-- Color Filter -->
-          <div class="mb-6 filter-section">
-            <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
-              <span>Color</span>
-              <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
-            </button>
-            <label class="flex items-center gap-2.5 cursor-pointer p-2.5 border border-blue-500 rounded-lg bg-blue-50 mb-1 filter-option">
-              <input type="checkbox" checked class="custom-checkbox">
-              <span class="filter-value text-sm font-medium text-gray-800">White</span>
-              <span class="count-badge text-xs text-gray-500 ml-auto">(3)</span>
-            </label>
-          </div>
+            <!-- Color Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Color</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Color">
+                <option selected disabled>Color</option>
+                <option>White</option>
+                <option>Black</option>
+                <option>Navy</option>
+                <option>Red</option>
+              </select>
+              <div class="filter-values-list">
+                <label class="flex items-center gap-2.5 cursor-pointer p-2.5 border border-blue-500 rounded-lg bg-blue-50 mb-1 filter-option">
+                  <input type="checkbox" checked class="custom-checkbox">
+                  <span class="filter-value text-sm font-medium text-gray-800">White</span>
+                  <span class="count-badge text-xs text-gray-500 ml-auto">(3)</span>
+                </label>
+              </div>
+            </div>
 
-          <hr class="border-gray-200 my-5">
+            <hr class="filter-divider border-gray-200 my-5">
 
-          <!-- Size Filter -->
-          <div class="mb-6 filter-section">
-            <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
-              <span>Size</span>
-              <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
-            </button>
-            <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
-              <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                <input type="radio" name="size" class="w-4 h-4 accent-blue-600">
-                <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">1</span>
-                <span class="count-badge text-xs text-gray-400 ml-auto">(45)</span>
-              </label>
-              <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                <input type="radio" name="size" checked class="w-4 h-4 accent-blue-600">
-                <span class="filter-value text-sm font-medium text-gray-900">10</span>
-                <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
-              </label>
-              <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                <input type="radio" name="size" class="w-4 h-4 accent-blue-600">
-                <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">11</span>
-                <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
-              </label>
+            <!-- Size Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Size</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Size">
+                <option selected disabled>Size</option>
+                <option>1</option>
+                <option>10</option>
+                <option>11</option>
+              </select>
+              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="size" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">1</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(45)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="size" checked class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm font-medium text-gray-900">10</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="size" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">11</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
+                </label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Brand Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Brand</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Brand">
+                <option selected disabled>Brand</option>
+                <option>adidas</option>
+                <option>nike</option>
+                <option>puma</option>
+              </select>
+              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="brand" checked class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm font-medium text-gray-900">adidas</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="brand" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">nike</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(19)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="brand" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">puma</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(12)</span>
+                </label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Material Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Material</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Material">
+                <option selected disabled>Material</option>
+                <option>cotton</option>
+                <option>linen</option>
+                <option>blend</option>
+              </select>
+              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="material" checked class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm font-medium text-gray-900">cotton</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(14)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="material" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">linen</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(8)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="material" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">blend</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(11)</span>
+                </label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Style Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Style</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Style">
+                <option selected disabled>Style</option>
+                <option>classic</option>
+                <option>sport</option>
+                <option>street</option>
+              </select>
+              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="style" checked class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm font-medium text-gray-900">classic</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(18)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="style" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">sport</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(11)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="style" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">street</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(9)</span>
+                </label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Fit Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Fit</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Fit">
+                <option selected disabled>Fit</option>
+                <option>slim</option>
+                <option>regular</option>
+                <option>relaxed</option>
+              </select>
+              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="fit" checked class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm font-medium text-gray-900">slim</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(16)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="fit" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">regular</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(24)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="fit" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">relaxed</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(10)</span>
+                </label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Sleeve Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Sleeve</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Sleeve">
+                <option selected disabled>Sleeve</option>
+                <option>short</option>
+                <option>long</option>
+                <option>sleeveless</option>
+              </select>
+              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="sleeve" checked class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm font-medium text-gray-900">short</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(21)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="sleeve" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">long</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(13)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="sleeve" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">sleeveless</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(7)</span>
+                </label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Pattern Filter -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Pattern</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <select class="filter-select" aria-label="Pattern">
+                <option selected disabled>Pattern</option>
+                <option>solid</option>
+                <option>stripe</option>
+                <option>graphic</option>
+              </select>
+              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="pattern" checked class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm font-medium text-gray-900">solid</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(30)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="pattern" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">stripe</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(9)</span>
+                </label>
+                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
+                  <input type="radio" name="pattern" class="w-4 h-4 accent-blue-600">
+                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">graphic</span>
+                  <span class="count-badge text-xs text-gray-400 ml-auto">(12)</span>
+                </label>
+              </div>
+            </div>
             </div>
           </div>
-
-          <hr class="border-gray-200 my-5">
-
-          <!-- Brand/Tag Filter -->
-          <div class="mb-6 filter-section">
-            <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
-              <span>Brand</span>
-              <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
-            </button>
-            <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
-              <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                <input type="radio" name="brand" checked class="w-4 h-4 accent-blue-600">
-                <span class="filter-value text-sm font-medium text-gray-900">adidas</span>
-                <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
-              </label>
-              <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                <input type="radio" name="brand" class="w-4 h-4 accent-blue-600">
-                <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">nike</span>
-                <span class="count-badge text-xs text-gray-400 ml-auto">(19)</span>
-              </label>
-              <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                <input type="radio" name="brand" class="w-4 h-4 accent-blue-600">
-                <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">puma</span>
-                <span class="count-badge text-xs text-gray-400 ml-auto">(12)</span>
-              </label>
-            </div>
-          </div>
-          
-          <!-- Apply Button (reflects filter button settings) -->
-          <button id="filter-apply-btn" class="w-full mt-4 py-2.5 text-sm font-semibold rounded-lg transition-all bg-blue-600 text-white hover:bg-blue-700">
-            Apply Filters
-          </button>
         </div>
       </aside>
 
@@ -1012,6 +1292,8 @@
     // Filter bar defaults
     filterBarBg: '#ffffff',
     filterBarWidth: '256',
+    filterLayout: 'offcanvas-desktop',
+    horizontalColumns: '3',
     optLabelFont: "'Inter', sans-serif",
     optLabelSize: '14',
     optLabelColor: '#111827',
@@ -1092,9 +1374,15 @@
     
     // FIX #2: Sticky filter logic
     applyStickyFilter(c);
+
+    // Filter layout (horizontal vs sidebar)
+    applyFilterLayout(c);
     
     // Filter Sidebar Styling
     applyFilterSidebar(c);
+
+    // Grid layout settings
+    applyGridLayout(c);
     
     // Each Product Card
     document.querySelectorAll('.product-card').forEach(card => {
@@ -1110,6 +1398,9 @@
     
     // Toolbar elements styling (FIX #4)
     applyToolbarStyles(c);
+
+    // Pagination style
+    applyPaginationStyle(c);
     
     console.log('✅ All settings applied successfully');
   }
@@ -1147,17 +1438,54 @@
   }
 
   /**
+   * Filter Layout - horizontal grid vs sidebar
+   */
+  function applyFilterLayout(c) {
+    const panel = document.getElementById('filter-panel');
+    const sidebar = document.getElementById('filter-sidebar');
+    const horizontalWrapper = document.getElementById('filter-horizontal-wrapper');
+
+    if (!panel || !sidebar || !horizontalWrapper) return;
+
+    const layout = c.filterLayout || 'offcanvas-desktop';
+    const isHorizontal = layout === 'horizontal';
+    const columnCount = c.horizontalColumns || '3';
+    const gapMap = { '2': '32px', '3': '24px', '4': '18px', '5': '12px', '6': '8px' };
+
+    panel.classList.toggle('filter-horizontal', isHorizontal);
+    panel.style.setProperty('--filter-columns', columnCount);
+    panel.style.setProperty('--filter-gap', gapMap[columnCount] || '16px');
+
+    if (isHorizontal) {
+      horizontalWrapper.classList.remove('hidden');
+      sidebar.classList.add('hidden');
+      if (!horizontalWrapper.contains(panel)) {
+        horizontalWrapper.appendChild(panel);
+      }
+    } else {
+      horizontalWrapper.classList.add('hidden');
+      sidebar.classList.remove('hidden');
+      if (!sidebar.contains(panel)) {
+        sidebar.appendChild(panel);
+      }
+    }
+  }
+
+  /**
    * Filter Sidebar Styling
    */
   function applyFilterSidebar(c) {
     const panel = document.getElementById('filter-panel');
     const sidebar = document.getElementById('filter-sidebar');
+    const isHorizontal = c.filterLayout === 'horizontal';
     
-    if (panel && c.filterBarBg) {
+    if (panel && c.filterBarBg && !isHorizontal) {
       panel.style.backgroundColor = c.filterBarBg;
+    } else if (panel && isHorizontal) {
+      panel.style.backgroundColor = 'transparent';
     }
 
-    if (c.filterBarWidth) {
+    if (c.filterBarWidth && !isHorizontal) {
       const widthValue = c.filterBarWidth + 'px';
       panel.style.width = widthValue;
       panel.style.minWidth = widthValue;
@@ -1165,6 +1493,10 @@
       if (sidebar) {
         sidebar.style.width = widthValue;
       }
+    } else if (isHorizontal) {
+      panel.style.width = '100%';
+      panel.style.minWidth = '';
+      panel.style.maxWidth = '';
     }
     
     // Filter headers (option labels)
@@ -1173,6 +1505,15 @@
       if (c.optLabelSize) el.style.fontSize = c.optLabelSize + 'px';
       if (c.optLabelColor) el.style.color = c.optLabelColor;
       if (c.optLabelWeight) el.style.fontWeight = c.optLabelWeight;
+      if (c.optLabelTransform) el.style.textTransform = c.optLabelTransform;
+    });
+
+    document.querySelectorAll('.filter-select').forEach(el => {
+      if (c.optLabelFont) el.style.fontFamily = c.optLabelFont;
+      if (c.optLabelSize) el.style.fontSize = c.optLabelSize + 'px';
+      if (c.optLabelColor) el.style.color = c.optLabelColor;
+      if (c.optLabelWeight) el.style.fontWeight = c.optLabelWeight;
+      if (c.optLabelTransform) el.style.textTransform = c.optLabelTransform;
     });
     
     // Filter values
@@ -1181,6 +1522,7 @@
       if (c.valSize) el.style.fontSize = c.valSize + 'px';
       if (c.valColor) el.style.color = c.valColor;
       if (c.valWeight) el.style.fontWeight = c.valWeight;
+      if (c.valTransform) el.style.textTransform = c.valTransform;
     });
     
     // Filter title
@@ -1201,6 +1543,67 @@
       if (c.btnTransform) applyBtn.style.textTransform = c.btnTransform;
       if (c.btnRadius) applyBtn.style.borderRadius = c.btnRadius + 'px';
     }
+  }
+
+  /**
+   * Grid layout settings
+   */
+  function applyGridLayout(c) {
+    const grid = document.getElementById('product-grid');
+    const cards = grid ? Array.from(grid.querySelectorAll('.product-card')) : [];
+    const count = document.getElementById('product-count');
+
+    if (grid && c.itemsPerRow) {
+      grid.style.gridTemplateColumns = `repeat(${c.itemsPerRow}, minmax(0, 1fr))`;
+    }
+
+    if (cards.length && c.productsPerPage) {
+      const limit = parseInt(c.productsPerPage, 10);
+      cards.forEach((card, index) => {
+        card.style.display = index < limit ? '' : 'none';
+      });
+      if (count) count.textContent = `${Math.min(limit, cards.length)} products`;
+    }
+  }
+
+  /**
+   * Pagination style settings
+   */
+  function applyPaginationStyle(c) {
+    const pagination = document.getElementById('pagination-container');
+    if (!pagination) return;
+
+    pagination.innerHTML = '';
+
+    if (c.pagination === 'show-more') {
+      const btn = document.createElement('button');
+      btn.className = 'page-btn';
+      btn.textContent = 'Show More';
+      btn.style.padding = '0 16px';
+      pagination.appendChild(btn);
+      return;
+    }
+
+    if (c.pagination === 'infinite') {
+      pagination.style.display = 'none';
+      return;
+    }
+
+    pagination.style.display = '';
+    ['prev', '1', '2', '3', 'next'].forEach((label, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'page-btn';
+      if (label === 'prev') {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-chevron-left text-xs"></i>';
+      } else if (label === 'next') {
+        btn.innerHTML = '<i class="fas fa-chevron-right text-xs"></i>';
+      } else {
+        btn.textContent = label;
+        if (index === 1) btn.classList.add('active');
+      }
+      pagination.appendChild(btn);
+    });
   }
 
   /**
@@ -1268,7 +1671,39 @@
     // Image container radius
     const imgContainer = card.querySelector('.product-image-container');
     if (imgContainer && c.imageRadius) {
-      imgContainer.style.borderRadius = c.imageRadius + 'px';
+      const baseRadius = parseInt(c.imageRadius, 10) || 0;
+      if (c.imageShape === 'rounded') {
+        imgContainer.style.borderRadius = Math.max(baseRadius, 18) + 'px';
+      } else {
+        imgContainer.style.borderRadius = baseRadius + 'px';
+      }
+    }
+
+    if (imgContainer) {
+      if (c.imageRatio === 'portrait') {
+        imgContainer.style.aspectRatio = '3 / 4';
+        imgContainer.classList.remove('aspect-square');
+      } else if (c.imageRatio === 'adapt') {
+        imgContainer.style.aspectRatio = 'auto';
+        imgContainer.classList.remove('aspect-square');
+      } else {
+        imgContainer.style.aspectRatio = '1 / 1';
+        imgContainer.classList.add('aspect-square');
+      }
+    }
+
+    // Optional second image on hover
+    if (imgContainer) {
+      const mainImage = imgContainer.querySelector('.product-image');
+      let secondary = imgContainer.querySelector('.product-image-secondary');
+      if (!secondary && mainImage) {
+        secondary = document.createElement('img');
+        secondary.className = 'product-image-secondary';
+        secondary.src = mainImage.src;
+        secondary.alt = mainImage.alt;
+        imgContainer.appendChild(secondary);
+      }
+      card.classList.toggle('second-image-enabled', c.hoverSecondImage === true || c.hoverSecondImage === 'true');
     }
     
     // Content area alignment
@@ -1312,6 +1747,7 @@
       reviewSection.style.display = (c.showRating && c.showReviewCount) ? '' : 'none';
     }
     if (ratingContainer) {
+      ratingContainer.style.justifyContent = c.contentAlign === 'center' ? 'center' : c.contentAlign === 'right' ? 'flex-end' : 'flex-start';
       const stars = card.querySelector('.stars');
       if (stars && c.ratingType === 'text') {
         stars.innerHTML = '<span class="text-gray-700 font-semibold text-xs">4.5/5</span>';
@@ -1354,6 +1790,12 @@
           if (c.salePriceFont) salePrice.style.fontFamily = c.salePriceFont;
           if (c.salePriceWeight) salePrice.style.fontWeight = c.salePriceWeight;
         }
+
+        [regularPrice, oldPrice, salePrice].forEach((priceEl) => {
+          if (priceEl && priceEl.textContent) {
+            priceEl.textContent = formatPriceValue(priceEl.textContent, c);
+          }
+        });
       }
     }
     
@@ -1538,6 +1980,17 @@
     }
   }
 
+  function formatPriceValue(text, c) {
+    const num = parseFloat(text.replace(/[^0-9.]/g, ''));
+    if (Number.isNaN(num)) return text;
+    let value = num;
+    if (c.roundUp) value = Math.ceil(value);
+    if (c.hideDecimal) {
+      return `$${Math.round(value)}`;
+    }
+    return `$${value.toFixed(2)}`;
+  }
+
   /**
    * FIX #1: Badge System - Improved to handle multiple badges without overlapping
    * Uses flexbox columns in each zone for proper stacking
@@ -1596,6 +2049,7 @@
       badge.style.color = c.soldOutColor || '#ffffff';
       badge.style.fontSize = (c.soldOutFontSize || '11') + 'px';
       badge.style.fontWeight = c.soldOutWeight || '400';
+      if (c.soldOutFont) badge.style.fontFamily = c.soldOutFont;
       
       const pos = (c.soldOutPos || 'top-left').replace('-', '');
       const zoneMap = {'topleft': 'tl', 'topright': 'tr', 'bottomleft': 'bl', 'bottomright': 'br'};
@@ -1613,6 +2067,7 @@
       badge.style.color = c.lowStockColor || '#ffffff';
       badge.style.fontSize = (c.lowStockFontSize || '10') + 'px';
       badge.style.fontWeight = c.lowStockWeight || '400';
+      if (c.lowStockFont) badge.style.fontFamily = c.lowStockFont;
       
       const pos = (c.lowStockPos || 'top-right').replace('-', '');
       const zoneMap = {'topleft': 'tl', 'topright': 'tr', 'bottomleft': 'bl', 'bottomright': 'br'};
@@ -1657,13 +2112,20 @@
         
         if (c.wishlistType !== 'heart') {
           const customText = c.wishlistType === 'custom' ? 'Save' : 'Wishlist';
-          wishBtn.innerHTML = `<span style="font-size:${c.wishlistFontSize||'14'}px;font-family:${c.wishlistFont||'inherit'};font-weight:${c.wishlistWeight||'400'}">${customText}</span>`;
+          wishBtn.innerHTML = `<span style="font-size:${c.wishlistFontSize||'14'}px;font-family:${c.wishlistFont||'inherit'};font-weight:${c.wishlistWeight||'400'};text-transform:${c.wishlistTransform||'none'}">${customText}</span>`;
           wishBtn.classList.remove('w-9', 'h-9');
           wishBtn.classList.add('px-3', 'py-1.5', 'rounded-lg', 'text-xs');
         } else {
           wishBtn.innerHTML = '<i class="far fa-heart text-sm"></i>';
         }
       }
+    }
+
+    if (wishInline) {
+      if (c.wishlistFont) wishInline.style.fontFamily = c.wishlistFont;
+      if (c.wishlistFontSize) wishInline.style.fontSize = c.wishlistFontSize + 'px';
+      if (c.wishlistWeight) wishInline.style.fontWeight = c.wishlistWeight;
+      if (c.wishlistTransform) wishInline.style.textTransform = c.wishlistTransform;
     }
   }
 
@@ -1672,6 +2134,7 @@
    */
   function applyQuickViewButton(card, c) {
     const qvBtn = card.querySelector('.qv-btn');
+    const qvInline = card.querySelector('.qv-inline');
     
     if (!c.showQuickView) {
       if (qvBtn) qvBtn.style.display = 'none';
@@ -1708,6 +2171,16 @@
         qvBtn.classList.add('w-9', 'h-9');
       }
     }
+
+    if (qvInline) {
+      if (c.quickViewType === 'custom') {
+        qvInline.textContent = c.quickViewCustomText || 'Quick View';
+      }
+      if (c.quickViewFont) qvInline.style.fontFamily = c.quickViewFont;
+      if (c.quickViewFontSize) qvInline.style.fontSize = c.quickViewFontSize + 'px';
+      if (c.quickViewWeight) qvInline.style.fontWeight = c.quickViewWeight;
+      if (c.quickViewTransform) qvInline.style.textTransform = c.quickViewTransform;
+    }
   }
 
   /**
@@ -1717,9 +2190,11 @@
     const modalAtc = document.getElementById('modal-atc-btn');
     if (modalAtc) {
       if (c.atcFont) modalAtc.style.fontFamily = c.atcFont;
+      if (c.atcFontSize) modalAtc.style.fontSize = c.atcFontSize + 'px';
       if (c.atcTextColor) modalAtc.style.color = c.atcTextColor;
       if (c.atcBgColor) modalAtc.style.backgroundColor = c.atcBgColor;
       if (c.atcWeight) modalAtc.style.fontWeight = c.atcWeight;
+      if (c.atcTransform) modalAtc.style.textTransform = c.atcTransform;
       if (c.atcRadius) modalAtc.style.borderRadius = c.atcRadius + 'px';
     }
     
