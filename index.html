@@ -90,8 +90,8 @@
       overflow-y: auto;
       align-self: flex-start;
     }
-    /* Limit live preview mockup to 6 sections (3 cols x 2 rows) when horizontal */
-    .filter-preview-horizontal #filter-preview-sections > .filter-preview-section:nth-child(n+7) {
+    /* Limit live preview mockup to 3 sections (1 row only) when horizontal */
+    .filter-preview-horizontal #filter-preview-sections > .filter-preview-section:nth-child(n+4) {
       display: none;
     }
     .filter-preview-horizontal .filter-preview-section.open .filter-preview-values {
@@ -140,22 +140,29 @@
 
     .filter-preview-horizontal #filter-preview-sections {
       display: flex;
-      flex-wrap: wrap;
-      gap: var(--filter-gap, 10px);
+      flex: 1 1 auto;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: var(--filter-gap, 8px);
+      min-width: 0;
     }
 
     .filter-preview-horizontal #filter-preview-header-row {
       display: flex;
       align-items: center;
+      flex-wrap: nowrap;
       gap: 10px;
+      margin-bottom: 0;
     }
 
     .filter-preview-horizontal #filter-preview-title {
       margin: 0;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .filter-preview-horizontal .filter-preview-section {
+      flex: 1 1 0;
       min-width: 0;
       margin-bottom: 0;
     }
@@ -164,35 +171,46 @@
       display: none;
     }
 
+    /* Hide Apply button row in horizontal layout */
+    .filter-preview-horizontal #filter-preview-footer {
+      display: none !important;
+    }
+
     .filter-preview-horizontal .filter-preview-values {
       display: none;
-      /* Reserve enough room per cell for "name + count" without overlap */
-      grid-template-columns: repeat(var(--filter-value-columns, 3), minmax(120px, 1fr));
-      gap: 8px 14px;
-      padding: 10px;
-      margin-top: 6px;
+      grid-template-columns: repeat(var(--filter-value-columns, 3), minmax(0, 1fr));
+      gap: 4px 10px;
+      padding: 8px 10px;
+      margin-top: 4px;
       background: #ffffff;
       border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-      /* Cap to ~2 rows then scroll when there are many options */
-      max-height: 120px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      max-height: 140px;
       overflow-y: auto;
-      overflow-x: auto;
       width: max-content;
-      min-width: max(220px, calc(var(--filter-value-columns, 3) * 130px));
-      max-width: 100%;
+      min-width: calc(var(--filter-value-columns, 3) * 90px);
+      max-width: 360px;
+      font-size: 10px;
     }
     .filter-preview-horizontal .filter-preview-values > label {
       white-space: nowrap;
+    }
+    .filter-preview-horizontal .filter-preview-values label span {
+      font-size: 10px !important;
+    }
+    .filter-preview-horizontal .filter-preview-values .count-badge {
+      font-size: 9px !important;
+      padding: 0 4px;
+      min-width: 14px;
     }
 
     .filter-preview-select {
       width: 100%;
       border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      padding: 0.35rem 0.5rem;
+      border-radius: 5px;
+      font-size: 0.62rem;
+      padding: 0.22rem 0.4rem;
       background: white;
       display: none;
       min-width: 0;
@@ -210,10 +228,6 @@
 
     .filter-preview-horizontal .filter-preview-section.open .filter-preview-values {
       display: grid;
-    }
-
-    .filter-preview-horizontal #filter-preview-footer {
-      grid-column: 1 / -1;
     }
 
     /* Extra spacing for all sections */
@@ -579,7 +593,7 @@
   <!-- ==================== FILTER DESIGN TAB ==================== -->
   <div id="filter-tab" class="tab-content">
     <div class="flex gap-5 p-5 bg-gray-50/50">
-      <div class="w-2/3 space-y-4">
+      <div class="flex-1 min-w-0 space-y-4">
         <!-- Filter Layout -->
         <div class="config-box">
           <h2 class="section-title mb-1">Filter Layout</h2>
@@ -609,15 +623,16 @@
             </select>
           </div>
           <input type="hidden" id="filter-layout" value="offcanvas-desktop">
-        </div>
-        <!-- Filter Layout (Mobile) -->
-        <div class="config-box">
-          <h2 class="section-title mb-1">Filter Layout (Mobile)</h2>
-          <p class="text-[11px] text-gray-500 mb-2">Mobile use Off-Canvas as default</p>
-          <div class="grid grid-cols-3 gap-2.5">
-            <div class="option-card selected rounded-lg p-2.5 bg-white border border-gray-200 cursor-default">
-              <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="mobile-layout" checked class="w-3 h-3 accent-blue-600" disabled><span class="text-[11px] font-medium leading-tight">Off-Canvas<br>(Mobile)</span></div>
-              <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex"><div class="w-4 bg-blue-200/70 rounded"></div></div>
+
+          <!-- Filter Layout (Mobile) — merged into the same box, separated by a divider -->
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <h2 class="section-title mb-1">Filter Layout (Mobile)</h2>
+            <p class="text-[11px] text-gray-500 mb-2">Mobile use Off-Canvas as default</p>
+            <div class="grid grid-cols-3 gap-2.5">
+              <div class="option-card selected rounded-lg p-2.5 bg-white border border-gray-200 cursor-default">
+                <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="mobile-layout" checked class="w-3 h-3 accent-blue-600" disabled><span class="text-[11px] font-medium leading-tight">Off-Canvas<br>(Mobile)</span></div>
+                <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex"><div class="w-4 bg-blue-200/70 rounded"></div></div>
+              </div>
             </div>
           </div>
         </div>
@@ -794,10 +809,10 @@
         </div>
       </div>
       <!-- Right Preview -->
-      <div class="w-1/3">
+      <div id="filter-preview-col" class="flex-shrink-0" style="width: 280px;">
         <div class="preview-sticky config-box shadow-md">
           <h3 class="section-title mb-2 pb-1.5 border-b border-gray-100">Live Preview</h3>
-          <div id="filter-preview-panel" class="border border-gray-200 rounded-lg p-3.5 min-h-[450px] flex flex-col overflow-auto transition-all duration-300" style="background:#ffffff;">
+          <div id="filter-preview-panel" class="border border-gray-200 rounded-lg p-3.5 min-h-[450px] flex flex-col overflow-y-auto overflow-x-hidden transition-all duration-300" style="background:#ffffff;">
             <div id="filter-preview-header-row" class="mb-2.5">
               <div id="filter-preview-title" class="text-blue-600 text-[11px] font-bold tracking-wide uppercase">Filter By</div>
               <div id="filter-preview-sections">
@@ -825,6 +840,12 @@
                     <span class="text-[13px] flex-1">Pants</span>
                     <span class="count-badge">31</span>
                   </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Shirts</span><span class="count-badge">19</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Dresses</span><span class="count-badge">14</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Skirts</span><span class="count-badge">9</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Shorts</span><span class="count-badge">17</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Sweaters</span><span class="count-badge">11</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Coats</span><span class="count-badge">7</span></label>
                 </div>
               </div>
              
@@ -852,6 +873,12 @@
                     <span class="text-[13px] flex-1">$300+</span>
                     <span class="count-badge">11</span>
                   </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Under $25</span><span class="count-badge">29</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$25 — $75</span><span class="count-badge">38</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$75 — $200</span><span class="count-badge">42</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$200 — $500</span><span class="count-badge">15</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$500 — $1000</span><span class="count-badge">8</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$1000+</span><span class="count-badge">3</span></label>
                 </div>
               </div>
              
@@ -879,6 +906,12 @@
                     <span class="text-[13px] flex-1">Red</span>
                     <span class="count-badge">19</span>
                   </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Blue</span><span class="count-badge">47</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Green</span><span class="count-badge">22</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Grey</span><span class="count-badge">61</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Beige</span><span class="count-badge">28</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Pink</span><span class="count-badge">14</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Yellow</span><span class="count-badge">9</span></label>
                 </div>
               </div>
               <div class="filter-preview-section mb-3.5">
@@ -1062,13 +1095,13 @@
         </div>
        
         <!-- Mobile Grid -->
-        <div class="config-box opacity-80">
+        <div class="config-box opacity-80" data-no-collapse="1">
           <h2 class="section-title mb-1">Product Grid (Mobile)</h2>
           <p class="text-[11px] text-gray-500 leading-relaxed">Fixed at 2 items per row. Pagination not available. <a href="#" class="text-blue-600 hover:underline">Contact us</a> for mobile customization.</p>
         </div>
        
         <!-- General Settings -->
-        <div class="config-box">
+        <div class="config-box" data-default-expanded="1">
           <h2 class="section-title mb-2">General Settings</h2>
           <div class="flex flex-wrap gap-x-6 gap-y-1.5">
             <label class="flex items-center gap-1.5 text-[13px] text-gray-700 cursor-pointer"><input type="checkbox" id="hover-second" checked class="accent-blue-600 w-3.5 h-3.5"> Show second image on hover</label>
@@ -1197,8 +1230,44 @@
           </div>
         </div>
         
+        <!-- Product Title (moved above SKU) -->
+        <div class="config-box">
+          <h2 class="section-title mb-1.5">Product Title</h2>
+         
+          <div class="font-select-wrap">
+            <label>Font</label>
+            <select id="title-font" class="font-select"></select>
+          </div>
+         
+          <div class="ctrl-row">
+            <label>Color</label>
+            <div class="color-picker-compact"><input type="color" id="title-color" value="#111827"><input type="text" id="title-color-hex" value="#111827" readonly></div>
+          </div>
+         
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+            <div class="ctrl-row mb-0"><label>Transform</label><select id="title-transform" class="micro-select w-28">
+              <option value="none">None</option>
+              <option value="capitalize">Capitalize</option>
+              <option value="uppercase">Uppercase</option>
+              <option value="lowercase">Lowercase</option>
+            </select></div>
+            <div class="ctrl-row mb-0"><label>Weight</label><select id="title-weight" class="micro-select w-28">
+              <option value="300">Light</option>
+              <option value="400" selected>Regular</option>
+              <option value="700">Bold</option>
+            </select></div>
+          </div>
+         
+          <div class="slider-row mb-0">
+            <label>Size</label>
+            <input type="range" id="title-font-size" min="11" max="24" value="15" class="flex-1">
+            <span id="title-font-val" class="slider-val">15px</span>
+          </div>
+        </div>
+
         <!-- ============================================== -->
         <!-- NEW: SKU SECTION                             -->
+        <!-- ============================================== -->
         <!-- ============================================== -->
         <div class="config-box" id="sku-config-box">
           <div class="flex items-center justify-between mb-1.5">
@@ -1367,40 +1436,7 @@
           </div>
         </div>
        
-        <!-- Product Title -->
-        <div class="config-box">
-          <h2 class="section-title mb-1.5">Product Title</h2>
-         
-          <div class="font-select-wrap">
-            <label>Font</label>
-            <select id="title-font" class="font-select"></select>
-          </div>
-         
-          <div class="ctrl-row">
-            <label>Color</label>
-            <div class="color-picker-compact"><input type="color" id="title-color" value="#111827"><input type="text" id="title-color-hex" value="#111827" readonly></div>
-          </div>
-         
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-            <div class="ctrl-row mb-0"><label>Transform</label><select id="title-transform" class="micro-select w-28">
-              <option value="none">None</option>
-              <option value="capitalize">Capitalize</option>
-              <option value="uppercase">Uppercase</option>
-              <option value="lowercase">Lowercase</option>
-            </select></div>
-            <div class="ctrl-row mb-0"><label>Weight</label><select id="title-weight" class="micro-select w-28">
-              <option value="300">Light</option>
-              <option value="400" selected>Regular</option>
-              <option value="700">Bold</option>
-            </select></div>
-          </div>
-         
-          <div class="slider-row mb-0">
-            <label>Size</label>
-            <input type="range" id="title-font-size" min="11" max="24" value="15" class="flex-1">
-            <span id="title-font-val" class="slider-val">15px</span>
-          </div>
-        </div>
+        <!-- Product Title block moved above SKU Display -->
        
         <!-- Vendor -->
         <div class="config-box">
@@ -2068,16 +2104,29 @@ function updateFilterPreview() {
   // Apply filter bar width — VERTICAL/OFFCANVAS only (horizontal is full width)
   const barWidthInput = document.getElementById('filter-bar-width');
   const barWidth = barWidthInput.value;
+  const previewCol = document.getElementById('filter-preview-col');
   if (layout === 'horizontal') {
     panel.style.width = '100%';
     panel.style.minWidth = '';
     panel.style.maxWidth = '';
+    if (previewCol) {
+      previewCol.style.width = '';
+      previewCol.style.flex = '1 1 0';
+      previewCol.style.minWidth = '320px';
+    }
     barWidthInput.disabled = true;
     barWidthInput.style.opacity = '0.4';
   } else {
+    // Panel = barWidth, wrapper column = barWidth + config-box padding (32px) so panel fits without overflow
+    const colWidth = (parseInt(barWidth, 10) + 32);
     panel.style.width = barWidth + 'px';
     panel.style.minWidth = barWidth + 'px';
     panel.style.maxWidth = barWidth + 'px';
+    if (previewCol) {
+      previewCol.style.flex = '0 0 ' + colWidth + 'px';
+      previewCol.style.width = colWidth + 'px';
+      previewCol.style.minWidth = '';
+    }
     barWidthInput.disabled = false;
     barWidthInput.style.opacity = '';
   }
@@ -2103,18 +2152,37 @@ function updateFilterPreview() {
     el.style.fontWeight = optWeight;
   });
 
-  // Filter Value settings ALSO drive the value count badge
+  // Filter Value settings drive value labels
   const valFontSize = document.getElementById('val-font-size').value+'px';
   const valTransform = document.getElementById('val-transform').value;
   const valColor = document.getElementById('val-color').value;
   const valFont = document.getElementById('val-font').value;
   const valWeight = document.getElementById('val-weight').value;
-  document.querySelectorAll('[id^="preview-val-"], #filter-preview-panel .count-badge, #filter-preview-panel .filter-preview-values label span').forEach(el => {
+  // Value labels (NOT count badges) — full inheritance from Filter Value
+  document.querySelectorAll('#filter-preview-panel .filter-preview-values label > span:not(.count-badge)').forEach(el => {
     el.style.fontSize = valFontSize;
     el.style.textTransform = valTransform;
     el.style.color = valColor;
     el.style.fontFamily = valFont;
     el.style.fontWeight = valWeight;
+  });
+  // Count badges: Font + Size from Filter Value, Color = 70% opacity of valColor,
+  // Weight is NOT linked.
+  const valColorRgba = (function(hex){
+    const h = hex.replace('#','');
+    const r = parseInt(h.substring(0,2),16);
+    const g = parseInt(h.substring(2,4),16);
+    const b = parseInt(h.substring(4,6),16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',0.7)';
+  })(valColor);
+  document.querySelectorAll('#filter-preview-panel .count-badge').forEach(el => {
+    el.style.fontSize = valFontSize;
+    el.style.fontFamily = valFont;
+    el.style.color = valColorRgba;
+    el.style.backgroundColor = 'transparent';
+    // Intentionally do NOT set fontWeight — count badge weight is independent
+    el.style.fontWeight = '';
+    el.style.textTransform = '';
   });
   const btn = document.getElementById('preview-btn');
   btn.textContent = 'Apply Filters';
@@ -3195,6 +3263,7 @@ function initGridCollapsibles() {
   if (!tab) return;
   tab.querySelectorAll(':scope > .grid-layout-container > .grid-left-panel > .config-box').forEach(box => {
     if (box.dataset.collapseInit === '1') return;
+    if (box.dataset.noCollapse === '1') { box.dataset.collapseInit = '1'; return; }
     const title = box.querySelector(':scope > .section-title, :scope > div > .section-title');
     if (!title) return;
 
@@ -3257,7 +3326,7 @@ function initGridCollapsibles() {
     box.appendChild(header);
     if (subtextEl) box.appendChild(subtextEl);
     box.appendChild(body);
-    box.classList.add('collapsed');
+    if (box.dataset.defaultExpanded !== '1') box.classList.add('collapsed');
 
     const toggleFn = (e) => {
       // Don't toggle when clicking the on/off switch itself
