@@ -266,10 +266,15 @@
       padding: 0;
     }
 
-    /* Sticky filter support */
+    /* Sticky filter support — allow inside flex sidebar */
+    #filter-sidebar.sticky-aware { align-self: flex-start; }
     .sticky-filter-enabled {
-      position: sticky;
+      position: sticky !important;
       top: 80px;
+      z-index: 20;
+    }
+    #filter-horizontal-wrapper.sticky-filter-enabled {
+      background: #ffffff;
     }
 
     .filter-title-row {
@@ -281,6 +286,11 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      /* Cap visible values to ~5; scroll the rest inside the section */
+      max-height: 168px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 4px;
     }
     #filter-panel:not(.filter-horizontal) .filter-option {
       display: flex;
@@ -290,6 +300,19 @@
     #filter-panel:not(.filter-horizontal) .filter-values-list.px-1 {
       flex-direction: row;
       flex-wrap: wrap;
+      max-height: none;
+      overflow: visible;
+    }
+    /* Collapse animation for vertical sections */
+    #filter-panel:not(.filter-horizontal) .filter-section.collapsed .filter-values-list {
+      display: none !important;
+    }
+    #filter-panel:not(.filter-horizontal) .filter-section.collapsed .filter-header i.fa-chevron-down {
+      transform: rotate(-90deg);
+      transition: transform 0.2s ease;
+    }
+    #filter-panel:not(.filter-horizontal) .filter-header i.fa-chevron-down {
+      transition: transform 0.2s ease;
     }
 
     /* Horizontal filter layout */
@@ -985,17 +1008,9 @@
           
           <!-- Toolbar: Active Filters + Sort -->
           <div class="flex flex-wrap items-center justify-between gap-4 mb-6" id="toolbar-area">
-            <!-- Active Filters -->
+            <!-- Active Filters (populated dynamically when user selects filter values) -->
             <div class="flex flex-wrap items-center gap-2" id="active-filters-area">
-              <span id="filter-label-size" class="text-sm text-gray-600 mr-1 font-medium">Size:</span>
-              <span class="active-filter-tag" id="active-filter-size-10">
-                10 <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-              </span>
-              <span id="filter-label-tag" class="text-sm text-gray-600 mr-1 ml-2 font-medium">Tag:</span>
-              <span class="active-filter-tag" id="active-filter-tag-adidas">
-                adidas <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-              </span>
-              <button id="clear-all-btn" class="text-sm text-blue-600 hover:text-blue-800 font-medium ml-2 underline">Clear all</button>
+              <button id="clear-all-btn" class="text-sm text-blue-600 hover:text-blue-800 font-medium ml-2 underline" style="display:none;">Clear all</button>
             </div>
 
             <!-- Sort Dropdown -->
@@ -1669,6 +1684,7 @@
    */
   function applyAllSettings() {
     const c = currentConfig;
+    window.__lastConfig = c;
     
     // FIX #3: Background color applies to ENTIRE main content area (toolbar + grid + pagination)
     applyGridBackground(c);
@@ -1724,20 +1740,22 @@
   function applyStickyFilter(c) {
     const panel = document.getElementById('filter-panel');
     const sidebar = document.getElementById('filter-sidebar');
-    
-    if (panel) {
-      // Remove existing sticky class first
-      panel.classList.remove('sticky-filter-enabled');
-      
-      // If sticky is enabled in config AND not explicitly set to non-sticky
-      if (c.stickyFilter === true || c.stickyFilter === 'true') {
-        panel.classList.add('sticky-filter-enabled');
-        console.log('📌 Sticky filter enabled');
-      } else {
-        // If not sticky, ensure it doesn't have the class
-        panel.style.position = '';
-      }
+    const horizontalWrapper = document.getElementById('filter-horizontal-wrapper');
+    const enabled = c.stickyFilter === true || c.stickyFilter === 'true';
+    const isHorizontal = c.filterLayout === 'horizontal';
+
+    [panel, sidebar, horizontalWrapper].forEach(el => el && el.classList.remove('sticky-filter-enabled'));
+    if (sidebar) sidebar.classList.add('sticky-aware');
+
+    if (!enabled) return;
+
+    if (isHorizontal && horizontalWrapper) {
+      horizontalWrapper.classList.add('sticky-filter-enabled');
+    } else if (sidebar) {
+      // Sticky on the sidebar so the panel rides along inside the flex column
+      sidebar.classList.add('sticky-filter-enabled');
     }
+    console.log('📌 Sticky filter enabled');
   }
 
   /**
@@ -1810,46 +1828,38 @@
       panel.style.maxWidth = '';
     }
     
-    // Filter headers (option labels)
-    document.querySelectorAll('.filter-header span').forEach(el => {
-      if (c.optLabelFont) el.style.fontFamily = c.optLabelFont;
-      if (c.optLabelSize) el.style.fontSize = c.optLabelSize + 'px';
-      if (c.optLabelColor) el.style.color = c.optLabelColor;
-      if (c.optLabelWeight) el.style.fontWeight = c.optLabelWeight;
-      if (c.optLabelTransform) el.style.textTransform = c.optLabelTransform;
-    });
+    // Helper: set a CSS property as !important so Tailwind utility classes can't win
+    const setI = (el, prop, val) => { if (el && val !== undefined && val !== null && val !== '') el.style.setProperty(prop, val, 'important'); };
+    const applyLabel = (el) => {
+      if (!el) return;
+      setI(el, 'font-family', c.optLabelFont);
+      setI(el, 'font-size', c.optLabelSize ? c.optLabelSize + 'px' : '');
+      setI(el, 'color', c.optLabelColor);
+      setI(el, 'font-weight', c.optLabelWeight);
+      setI(el, 'text-transform', c.optLabelTransform);
+    };
+    const applyVal = (el) => {
+      if (!el) return;
+      setI(el, 'font-family', c.valFont);
+      setI(el, 'font-size', c.valSize ? c.valSize + 'px' : '');
+      setI(el, 'color', c.valColor);
+      setI(el, 'font-weight', c.valWeight);
+      setI(el, 'text-transform', c.valTransform);
+    };
 
-    document.querySelectorAll('.filter-select').forEach(el => {
-      if (c.optLabelFont) el.style.fontFamily = c.optLabelFont;
-      if (c.optLabelSize) el.style.fontSize = c.optLabelSize + 'px';
-      if (c.optLabelColor) el.style.color = c.optLabelColor;
-      if (c.optLabelWeight) el.style.fontWeight = c.optLabelWeight;
-      if (c.optLabelTransform) el.style.textTransform = c.optLabelTransform;
+    // Filter section headers (vertical) — style the whole button + inner span
+    document.querySelectorAll('.filter-header').forEach(btn => {
+      applyLabel(btn);
+      btn.querySelectorAll('span').forEach(applyLabel);
     });
+    document.querySelectorAll('.filter-select').forEach(applyLabel);
+    document.querySelectorAll('.filter-dropdown-toggle').forEach(applyLabel);
 
-    document.querySelectorAll('.filter-dropdown-toggle').forEach(el => {
-      if (c.optLabelFont) el.style.fontFamily = c.optLabelFont;
-      if (c.optLabelSize) el.style.fontSize = c.optLabelSize + 'px';
-      if (c.optLabelColor) el.style.color = c.optLabelColor;
-      if (c.optLabelWeight) el.style.fontWeight = c.optLabelWeight;
-      if (c.optLabelTransform) el.style.textTransform = c.optLabelTransform;
-    });
-    
-    // Filter values
-    document.querySelectorAll('.filter-value').forEach(el => {
-      if (c.valFont) el.style.fontFamily = c.valFont;
-      if (c.valSize) el.style.fontSize = c.valSize + 'px';
-      if (c.valColor) el.style.color = c.valColor;
-      if (c.valWeight) el.style.fontWeight = c.valWeight;
-      if (c.valTransform) el.style.textTransform = c.valTransform;
-    });
-    
-    // Filter title
-    const fTitle = document.getElementById('filter-title');
-    if (fTitle) {
-      if (c.optLabelFont) fTitle.style.fontFamily = c.optLabelFont;
-      if (c.optLabelColor) fTitle.style.color = c.optLabelColor;
-    }
+    // Filter values + count badges (count syncs with value styling)
+    document.querySelectorAll('.filter-value, .count-badge').forEach(applyVal);
+
+    // Filter title ("Filter by:") fully syncs with Filter Option Label settings
+    applyLabel(document.getElementById('filter-title'));
     
     // Apply button
     const applyBtn = document.getElementById('filter-apply-btn');
@@ -1887,24 +1897,32 @@
       };
 
       document.body.addEventListener('click', (event) => {
+        // Horizontal-mode dropdown toggle
         const toggle = event.target.closest('.filter-dropdown-toggle');
-        if (!toggle) return;
-
-        const section = toggle.closest('.filter-section');
-        if (!section) return;
-
-        const sectionContainer = section.parentElement;
-        const isOpen = section.classList.contains('open');
-
-        if (sectionContainer) {
-          sectionContainer.querySelectorAll('.filter-section.open').forEach(openSection => {
-            openSection.classList.remove('open');
-          });
+        if (toggle) {
+          const section = toggle.closest('.filter-section');
+          if (!section) return;
+          const sectionContainer = section.parentElement;
+          const isOpen = section.classList.contains('open');
+          if (sectionContainer) {
+            sectionContainer.querySelectorAll('.filter-section.open').forEach(s => s.classList.remove('open'));
+          }
+          if (!isOpen) {
+            section.classList.add('open');
+            requestAnimationFrame(() => positionDropdown(section));
+          }
+          return;
         }
 
-        if (!isOpen) {
-          section.classList.add('open');
-          requestAnimationFrame(() => positionDropdown(section));
+        // Vertical-mode header collapse/expand (chevron arrow)
+        const header = event.target.closest('.filter-header');
+        if (header) {
+          const panel = document.getElementById('filter-panel');
+          if (panel && panel.classList.contains('filter-horizontal')) return; // ignore in horizontal
+          const section = header.closest('.filter-section');
+          if (!section) return;
+          event.preventDefault();
+          section.classList.toggle('collapsed');
         }
       });
 
@@ -2646,12 +2664,78 @@
     if (e.key === 'Escape') closeQuickView();
   });
 
-  // Clear all functionality
+  // ====================================================================
+  // ACTIVE FILTERS — real selection logic
+  // ====================================================================
+  function refreshClearAllVisibility() {
+    const area = document.getElementById('active-filters-area');
+    if (!area) return;
+    const hasTags = area.querySelectorAll('.active-filter-tag').length > 0;
+    const btn = document.getElementById('clear-all-btn');
+    if (btn) btn.style.display = hasTags ? '' : 'none';
+  }
+
+  function styleActiveTag(tag) {
+    const c = window.__lastConfig || {};
+    if (c.valFont) tag.style.fontFamily = c.valFont;
+    if (c.valSize) tag.style.fontSize = c.valSize + 'px';
+    if (c.valColor) tag.style.color = c.valColor;
+    if (c.valWeight) tag.style.fontWeight = c.valWeight;
+    if (c.valTransform) tag.style.textTransform = c.valTransform;
+  }
+
+  function addActiveFilterTag(key, label, sourceEl) {
+    const area = document.getElementById('active-filters-area');
+    if (!area) return;
+    const id = 'active-filter-' + key;
+    if (document.getElementById(id)) return;
+    const tag = document.createElement('span');
+    tag.className = 'active-filter-tag';
+    tag.id = id;
+    tag.dataset.filterKey = key;
+    tag.innerHTML = label + ' <button type="button" aria-label="Remove"><i class="fas fa-times"></i></button>';
+    tag.querySelector('button').addEventListener('click', () => {
+      tag.remove();
+      if (sourceEl && 'checked' in sourceEl) sourceEl.checked = false;
+      refreshClearAllVisibility();
+    });
+    const clearBtn = document.getElementById('clear-all-btn');
+    area.insertBefore(tag, clearBtn);
+    styleActiveTag(tag);
+    refreshClearAllVisibility();
+  }
+
+  function removeActiveFilterTag(key) {
+    const tag = document.getElementById('active-filter-' + key);
+    if (tag) tag.remove();
+    refreshClearAllVisibility();
+  }
+
+  // Wire all filter checkboxes inside the filter panel
+  document.getElementById('filter-panel')?.addEventListener('change', (e) => {
+    const input = e.target;
+    if (input.tagName !== 'INPUT' || input.type !== 'checkbox') return;
+    const opt = input.closest('.filter-option');
+    if (!opt) return;
+    const valueText = opt.querySelector('.filter-value')?.textContent?.trim() || 'Filter';
+    const sectionTitle = opt.closest('.filter-section')?.querySelector('.filter-header span, h3, .filter-section-title')?.textContent?.trim() || '';
+    const key = (sectionTitle + '-' + valueText).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const label = sectionTitle ? (sectionTitle + ': ' + valueText) : valueText;
+    if (input.checked) addActiveFilterTag(key, label, input);
+    else removeActiveFilterTag(key);
+  });
+
+  // Clear all
   document.getElementById('clear-all-btn')?.addEventListener('click', function() {
     document.getElementById('active-filters-area').querySelectorAll('.active-filter-tag').forEach(tag => {
+      const id = tag.id.replace(/^active-filter-/, '');
       tag.remove();
     });
+    document.querySelectorAll('#filter-panel .filter-option input[type="checkbox"]').forEach(cb => cb.checked = false);
+    refreshClearAllVisibility();
   });
+
+  refreshClearAllVisibility();
 
   // ====================================================================
   // INITIALIZATION
