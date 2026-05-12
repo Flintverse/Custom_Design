@@ -175,6 +175,31 @@
       min-width: 0;
     }
 
+    .filter-dropdown-toggle {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 0.45rem 0.7rem;
+      padding-right: 28px;
+      font-size: 0.85rem;
+      background: white;
+      color: #374151;
+      text-align: left;
+      display: none;
+      position: relative;
+    }
+
+    .filter-dropdown-toggle::after {
+      content: "\25BE";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: #6b7280;
+      pointer-events: none;
+    }
+
     .filter-select:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 1.5px rgba(37,99,235,0.15);
@@ -237,8 +262,8 @@
     #main-content-wrapper {
       transition: background-color 0.3s ease;
       border-radius: 12px;
-      margin: -24px -32px;
-      padding: 24px 32px;
+      margin: 0;
+      padding: 0;
     }
 
     /* Sticky filter support */
@@ -272,11 +297,13 @@
     }
     #filter-panel.filter-horizontal .filter-sections {
       display: grid;
-      grid-template-columns: repeat(var(--filter-columns, 3), minmax(0, 1fr));
-      gap: var(--filter-gap, 16px);
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: var(--filter-gap, 12px);
+      align-items: start;
     }
     #filter-panel.filter-horizontal .filter-section {
       min-width: 0;
+      position: relative;
       margin-bottom: 0;
     }
     #filter-panel.filter-horizontal .filter-header {
@@ -292,8 +319,76 @@
     #filter-panel.filter-horizontal .filter-values-list {
       display: none;
     }
-    #filter-panel.filter-horizontal .filter-select {
+    #filter-panel.filter-horizontal .filter-dropdown-toggle {
       display: block;
+    }
+    #filter-panel.filter-horizontal .filter-section.open .filter-values-list {
+      display: grid;
+      position: absolute;
+      left: 0;
+      top: calc(100% + 6px);
+      grid-template-columns: repeat(var(--filter-value-columns, 1), minmax(0, 1fr));
+      gap: 6px 10px;
+      padding: 10px;
+      min-width: 220px;
+      width: max-content;
+      max-width: 480px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      z-index: 50;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    #filter-panel.filter-horizontal .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .filter-option.box-option {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+
+    .filter-option.box-option input {
+      display: none;
+    }
+
+    .filter-option.box-option .filter-value {
+      font-weight: 600;
+    }
+
+    .filter-option.swatch-option .swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid #d1d5db;
+      display: inline-block;
+    }
+
+    .filter-option.swatch-option .swatch-img {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid #e5e7eb;
+    }
+
+    @media (max-width: 1200px) {
+      #filter-panel.filter-horizontal .filter-sections {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      #filter-panel.filter-horizontal .filter-sections {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
     }
 
     /* Sold out overlay */
@@ -357,8 +452,7 @@
   </section>
 
   <!-- ==================== MAIN CONTENT ==================== -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div id="filter-horizontal-wrapper" class="hidden mb-6"></div>
+  <main class="max-w-6xl mx-auto px-6 lg:px-10 py-6">
     <div class="flex gap-8">
       
       <!-- ============ LEFT SIDEBAR: FILTERS ============ -->
@@ -367,51 +461,48 @@
           <div class="filter-title-row">
             <h2 id="filter-title" class="text-base font-bold text-gray-900 mb-4">Filter by:</h2>
             <div id="filter-sections" class="filter-sections">
-            <!-- Availability Filter -->
+            <!-- Category Filter (Checklist) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
-                <span>Availability</span>
+                <span>Category</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Availability">
-                <option selected disabled>Availability</option>
-                <option>In Stock</option>
-                <option>Out of Stock</option>
-              </select>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Category">Category</button>
               <div class="filter-values-list">
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="checkbox" class="custom-checkbox">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">Out of Stock</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
-                </label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Heels</span><span class="count-badge text-xs text-gray-400 ml-auto">(34)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Flats</span><span class="count-badge text-xs text-gray-400 ml-auto">(21)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Sandals</span><span class="count-badge text-xs text-gray-400 ml-auto">(19)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Boots</span><span class="count-badge text-xs text-gray-400 ml-auto">(15)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Sneakers</span><span class="count-badge text-xs text-gray-400 ml-auto">(28)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Loafers</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Mules</span><span class="count-badge text-xs text-gray-400 ml-auto">(17)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Wedges</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Platforms</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Mary Jane</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Oxfords</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Slippers</span><span class="count-badge text-xs text-gray-400 ml-auto">(11)</span></label>
               </div>
             </div>
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Price Range Filter -->
+            <!-- Price Filter (Slider) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Price</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Price">
-                <option selected disabled>Price</option>
-                <option>$0 — $50</option>
-                <option>$50 — $150</option>
-                <option>$150 — $300</option>
-                <option>$300+</option>
-              </select>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Price">Price</button>
               <div class="filter-values-list px-1">
-                <input type="range" min="0" max="500" value="170" class="range-slider w-full mb-3">
+                <input type="range" min="0" max="500" value="180" class="range-slider w-full mb-3">
                 <div class="flex items-center gap-3">
                   <div class="flex-1">
                     <label class="text-xs text-gray-500 mb-1 block">From ($)</label>
-                    <input type="number" value="170" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none">
+                    <input type="number" value="80" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none">
                   </div>
                   <div class="flex-1">
                     <label class="text-xs text-gray-500 mb-1 block">To ($)</label>
-                    <input type="number" value="170" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none">
+                    <input type="number" value="260" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500 focus:outline-none">
                   </div>
                 </div>
               </div>
@@ -419,256 +510,451 @@
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Color Filter -->
+            <!-- Color Filter (Swatches) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Color</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Color">
-                <option selected disabled>Color</option>
-                <option>White</option>
-                <option>Black</option>
-                <option>Navy</option>
-                <option>Red</option>
-              </select>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Color">Color</button>
               <div class="filter-values-list">
-                <label class="flex items-center gap-2.5 cursor-pointer p-2.5 border border-blue-500 rounded-lg bg-blue-50 mb-1 filter-option">
-                  <input type="checkbox" checked class="custom-checkbox">
-                  <span class="filter-value text-sm font-medium text-gray-800">White</span>
-                  <span class="count-badge text-xs text-gray-500 ml-auto">(3)</span>
-                </label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#000000"></span><span class="filter-value text-sm">Black</span><span class="count-badge text-xs text-gray-400 ml-auto">(18)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#ffffff"></span><span class="filter-value text-sm">White</span><span class="count-badge text-xs text-gray-400 ml-auto">(22)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#dc2626"></span><span class="filter-value text-sm">Red</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#2563eb"></span><span class="filter-value text-sm">Blue</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#16a34a"></span><span class="filter-value text-sm">Green</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#f59e0b"></span><span class="filter-value text-sm">Amber</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#f97316"></span><span class="filter-value text-sm">Orange</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#a855f7"></span><span class="filter-value text-sm">Violet</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#6b7280"></span><span class="filter-value text-sm">Gray</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#d97706"></span><span class="filter-value text-sm">Tan</span><span class="count-badge text-xs text-gray-400 ml-auto">(11)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#7c3aed"></span><span class="filter-value text-sm">Purple</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option swatch-option"><span class="swatch" style="background:#fca5a5"></span><span class="filter-value text-sm">Pink</span><span class="count-badge text-xs text-gray-400 ml-auto">(13)</span></label>
               </div>
             </div>
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Size Filter -->
+            <!-- Size Filter (Box) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Size</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Size">
-                <option selected disabled>Size</option>
-                <option>1</option>
-                <option>10</option>
-                <option>11</option>
-              </select>
-              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="size" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">1</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(45)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="size" checked class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm font-medium text-gray-900">10</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="size" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">11</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
-                </label>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Size">Size</button>
+              <div class="filter-values-list">
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">5</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">5.5</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">6</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">6.5</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">7</span><span class="count-badge text-xs text-gray-400 ml-auto">(15)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">7.5</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">8</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">8.5</span><span class="count-badge text-xs text-gray-400 ml-auto">(11)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">9</span><span class="count-badge text-xs text-gray-400 ml-auto">(13)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">9.5</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">10</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">11</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
               </div>
             </div>
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Brand Filter -->
+            <!-- Brand Filter (Checklist) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Brand</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Brand">
-                <option selected disabled>Brand</option>
-                <option>adidas</option>
-                <option>nike</option>
-                <option>puma</option>
-              </select>
-              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="brand" checked class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm font-medium text-gray-900">adidas</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(3)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="brand" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">nike</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(19)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="brand" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">puma</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(12)</span>
-                </label>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Brand">Brand</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Aldo</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Nine West</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Steve Madden</span><span class="count-badge text-xs text-gray-400 ml-auto">(11)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Vince Camuto</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Sam Edelman</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Cole Haan</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Naturalizer</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Clarks</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Guess</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Coach</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Michael Kors</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Jessica Simpson</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
               </div>
             </div>
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Material Filter -->
+            <!-- Material Filter (Checklist) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Material</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Material">
-                <option selected disabled>Material</option>
-                <option>cotton</option>
-                <option>linen</option>
-                <option>blend</option>
-              </select>
-              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="material" checked class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm font-medium text-gray-900">cotton</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(14)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="material" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">linen</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(8)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="material" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">blend</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(11)</span>
-                </label>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Material">Material</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Leather</span><span class="count-badge text-xs text-gray-400 ml-auto">(18)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Suede</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Patent</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Canvas</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Mesh</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Knit</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Denim</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Rubber</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">EVA</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Velvet</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Metallic</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Cork</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
               </div>
             </div>
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Style Filter -->
+            <!-- Style Filter (Checklist) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Style</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Style">
-                <option selected disabled>Style</option>
-                <option>classic</option>
-                <option>sport</option>
-                <option>street</option>
-              </select>
-              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="style" checked class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm font-medium text-gray-900">classic</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(18)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="style" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">sport</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(11)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="style" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">street</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(9)</span>
-                </label>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Style">Style</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Classic</span><span class="count-badge text-xs text-gray-400 ml-auto">(18)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Minimal</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Retro</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Street</span><span class="count-badge text-xs text-gray-400 ml-auto">(11)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Sport</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Boho</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Modern</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Edgy</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Elegant</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Glam</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Casual</span><span class="count-badge text-xs text-gray-400 ml-auto">(13)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Business</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
               </div>
             </div>
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Fit Filter -->
+            <!-- Fit Filter (Checklist) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Fit</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Fit">
-                <option selected disabled>Fit</option>
-                <option>slim</option>
-                <option>regular</option>
-                <option>relaxed</option>
-              </select>
-              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="fit" checked class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm font-medium text-gray-900">slim</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(16)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="fit" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">regular</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(24)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="fit" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">relaxed</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(10)</span>
-                </label>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Fit">Fit</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Slim</span><span class="count-badge text-xs text-gray-400 ml-auto">(16)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Regular</span><span class="count-badge text-xs text-gray-400 ml-auto">(24)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Relaxed</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Narrow</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Wide</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">True to Size</span><span class="count-badge text-xs text-gray-400 ml-auto">(19)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Runs Small</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Runs Large</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Adjustable</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Stretch</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Contoured</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Supportive</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
               </div>
             </div>
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Sleeve Filter -->
+            <!-- Sleeve Filter (Checklist) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Sleeve</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Sleeve">
-                <option selected disabled>Sleeve</option>
-                <option>short</option>
-                <option>long</option>
-                <option>sleeveless</option>
-              </select>
-              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="sleeve" checked class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm font-medium text-gray-900">short</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(21)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="sleeve" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">long</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(13)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="sleeve" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">sleeveless</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(7)</span>
-                </label>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Sleeve">Sleeve</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Sleeveless</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Short</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">3/4</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Long</span><span class="count-badge text-xs text-gray-400 ml-auto">(13)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Bell</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Cap</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Puff</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Dolman</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Raglan</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Batwing</span><span class="count-badge text-xs text-gray-400 ml-auto">(2)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Dropped</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Layered</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
               </div>
             </div>
 
             <hr class="filter-divider border-gray-200 my-5">
 
-            <!-- Pattern Filter -->
+            <!-- Pattern Filter (Image Swatches) -->
             <div class="mb-6 filter-section">
               <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
                 <span>Pattern</span>
                 <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
               </button>
-              <select class="filter-select" aria-label="Pattern">
-                <option selected disabled>Pattern</option>
-                <option>solid</option>
-                <option>stripe</option>
-                <option>graphic</option>
-              </select>
-              <div class="filter-values-list space-y-2 max-h-40 overflow-y-auto pr-1">
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="pattern" checked class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm font-medium text-gray-900">solid</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(30)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="pattern" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">stripe</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(9)</span>
-                </label>
-                <label class="flex items-center gap-2.5 cursor-pointer group filter-option">
-                  <input type="radio" name="pattern" class="w-4 h-4 accent-blue-600">
-                  <span class="filter-value text-sm text-gray-600 group-hover:text-gray-900">graphic</span>
-                  <span class="count-badge text-xs text-gray-400 ml-auto">(12)</span>
-                </label>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Pattern">Pattern</button>
+              <div class="filter-values-list">
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/101/40/40" alt="Solid"><span class="filter-value text-sm">Solid</span><span class="count-badge text-xs text-gray-400 ml-auto">(30)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/102/40/40" alt="Stripe"><span class="filter-value text-sm">Stripe</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/103/40/40" alt="Dot"><span class="filter-value text-sm">Dot</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/104/40/40" alt="Graphic"><span class="filter-value text-sm">Graphic</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/105/40/40" alt="Floral"><span class="filter-value text-sm">Floral</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/106/40/40" alt="Herringbone"><span class="filter-value text-sm">Herringbone</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/107/40/40" alt="Plaid"><span class="filter-value text-sm">Plaid</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/108/40/40" alt="Check"><span class="filter-value text-sm">Check</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/109/40/40" alt="Paisley"><span class="filter-value text-sm">Paisley</span><span class="count-badge text-xs text-gray-400 ml-auto">(2)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/110/40/40" alt="Snake"><span class="filter-value text-sm">Snake</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/111/40/40" alt="Zebra"><span class="filter-value text-sm">Zebra</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option swatch-option"><img class="swatch-img" src="https://picsum.photos/id/112/40/40" alt="Leopard"><span class="filter-value text-sm">Leopard</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Heel Height (Box) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Heel Height</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Heel Height">Heel Height</button>
+              <div class="filter-values-list">
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Flat</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Low (1-2")</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Mid (2-3")</span><span class="count-badge text-xs text-gray-400 ml-auto">(15)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">High (3-4")</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Sky (4+")</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Kitten</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Block</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Wedge</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Platform</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Cone</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Stiletto</span><span class="count-badge text-xs text-gray-400 ml-auto">(11)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Sculpted</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Toe Shape (Checklist) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Toe Shape</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Toe Shape">Toe Shape</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Round</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Almond</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Pointed</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Square</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Peep</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Open</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Snip</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Chisel</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Sling</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Cap</span><span class="count-badge text-xs text-gray-400 ml-auto">(2)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Tapered</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Square Soft</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Closure (Checklist) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Closure</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Closure">Closure</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Slip-On</span><span class="count-badge text-xs text-gray-400 ml-auto">(18)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Lace-Up</span><span class="count-badge text-xs text-gray-400 ml-auto">(11)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Buckle</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Zip</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Velcro</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Toggle</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Hook & Eye</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Magnetic</span><span class="count-badge text-xs text-gray-400 ml-auto">(2)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Strap</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Elastic</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Tie</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">None</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Occasion (Checklist) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Occasion</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Occasion">Occasion</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Work</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Party</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Wedding</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Casual</span><span class="count-badge text-xs text-gray-400 ml-auto">(19)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Travel</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Beach</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Evening</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Date Night</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Office</span><span class="count-badge text-xs text-gray-400 ml-auto">(11)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Brunch</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Outdoor</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Holiday</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Season (Checklist) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Season</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Season">Season</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Spring</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Summer</span><span class="count-badge text-xs text-gray-400 ml-auto">(18)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Fall</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Winter</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">All-Season</span><span class="count-badge text-xs text-gray-400 ml-auto">(20)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Resort</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Rain</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Snow</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Transitional</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Lightweight</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Insulated</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Breathable</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Sport (Checklist) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Sport</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Sport">Sport</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Running</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Training</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Walking</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Tennis</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Golf</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Hiking</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Basketball</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Soccer</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Dance</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Skate</span><span class="count-badge text-xs text-gray-400 ml-auto">(2)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Yoga</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Cycling</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Gender (Checklist) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Gender</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Gender">Gender</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Women</span><span class="count-badge text-xs text-gray-400 ml-auto">(38)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Men</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Unisex</span><span class="count-badge text-xs text-gray-400 ml-auto">(16)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Girls</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Boys</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Kids</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Youth</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Adult</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Petite</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Plus</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Maternity</span><span class="count-badge text-xs text-gray-400 ml-auto">(2)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">All</span><span class="count-badge text-xs text-gray-400 ml-auto">(20)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Width (Box) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Width</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Width">Width</button>
+              <div class="filter-values-list">
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Narrow</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Standard</span><span class="count-badge text-xs text-gray-400 ml-auto">(18)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Wide</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Extra Wide</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Slim</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Comfort</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Roomy</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Contour</span><span class="count-badge text-xs text-gray-400 ml-auto">(2)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Flex</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Stretch</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Secure</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Adjustable</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Feature (Checklist) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Feature</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Feature">Feature</button>
+              <div class="filter-values-list">
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Cushioned</span><span class="count-badge text-xs text-gray-400 ml-auto">(16)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Arch Support</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Lightweight</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Breathable</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Waterproof</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Slip-Resistant</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Memory Foam</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Vegan</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Recycled</span><span class="count-badge text-xs text-gray-400 ml-auto">(4)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Anti-Odor</span><span class="count-badge text-xs text-gray-400 ml-auto">(3)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Shock Absorb</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option"><input type="checkbox" class="custom-checkbox"><span class="filter-value text-sm">Removable Insole</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+              </div>
+            </div>
+
+            <hr class="filter-divider border-gray-200 my-5">
+
+            <!-- Rating (Box) -->
+            <div class="mb-6 filter-section">
+              <button class="filter-header flex items-center justify-between w-full text-sm font-semibold text-gray-800 mb-3 group">
+                <span>Rating</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600"></i>
+              </button>
+              <button type="button" class="filter-dropdown-toggle" aria-label="Rating">Rating</button>
+              <div class="filter-values-list">
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">5 Stars</span><span class="count-badge text-xs text-gray-400 ml-auto">(18)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">4+ Stars</span><span class="count-badge text-xs text-gray-400 ml-auto">(26)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">3+ Stars</span><span class="count-badge text-xs text-gray-400 ml-auto">(31)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">2+ Stars</span><span class="count-badge text-xs text-gray-400 ml-auto">(14)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">1+ Star</span><span class="count-badge text-xs text-gray-400 ml-auto">(9)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Top Rated</span><span class="count-badge text-xs text-gray-400 ml-auto">(12)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Most Reviewed</span><span class="count-badge text-xs text-gray-400 ml-auto">(8)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">New Reviews</span><span class="count-badge text-xs text-gray-400 ml-auto">(6)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Verified</span><span class="count-badge text-xs text-gray-400 ml-auto">(15)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Editor Pick</span><span class="count-badge text-xs text-gray-400 ml-auto">(5)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Trending</span><span class="count-badge text-xs text-gray-400 ml-auto">(7)</span></label>
+                <label class="filter-option box-option"><input type="checkbox"><span class="filter-value text-sm">Best Value</span><span class="count-badge text-xs text-gray-400 ml-auto">(10)</span></label>
               </div>
             </div>
             </div>
@@ -681,6 +967,7 @@
         
         <!-- FIX #3: WRAPPER FOR BACKGROUND COLOR - Now covers toolbar + grid + pagination -->
         <div id="main-content-wrapper" style="background-color: #f3f4f6;">
+          <div id="filter-horizontal-wrapper" class="hidden mb-6"></div>
           
           <!-- Toolbar: Active Filters + Sort -->
           <div class="flex flex-wrap items-center justify-between gap-4 mb-6" id="toolbar-area">
@@ -1377,6 +1664,8 @@
 
     // Filter layout (horizontal vs sidebar)
     applyFilterLayout(c);
+
+    initFilterDropdowns();
     
     // Filter Sidebar Styling
     applyFilterSidebar(c);
@@ -1450,21 +1739,22 @@
     const layout = c.filterLayout || 'offcanvas-desktop';
     const isHorizontal = layout === 'horizontal';
     const columnCount = c.horizontalColumns || '3';
-    const gapMap = { '2': '32px', '3': '24px', '4': '18px', '5': '12px', '6': '8px' };
 
     panel.classList.toggle('filter-horizontal', isHorizontal);
-    panel.style.setProperty('--filter-columns', columnCount);
-    panel.style.setProperty('--filter-gap', gapMap[columnCount] || '16px');
+    panel.style.setProperty('--filter-value-columns', columnCount);
+    panel.style.setProperty('--filter-gap', '10px');
 
     if (isHorizontal) {
       horizontalWrapper.classList.remove('hidden');
       sidebar.classList.add('hidden');
+      sidebar.style.display = 'none';
       if (!horizontalWrapper.contains(panel)) {
         horizontalWrapper.appendChild(panel);
       }
     } else {
       horizontalWrapper.classList.add('hidden');
       sidebar.classList.remove('hidden');
+      sidebar.style.display = '';
       if (!sidebar.contains(panel)) {
         sidebar.appendChild(panel);
       }
@@ -1515,6 +1805,14 @@
       if (c.optLabelWeight) el.style.fontWeight = c.optLabelWeight;
       if (c.optLabelTransform) el.style.textTransform = c.optLabelTransform;
     });
+
+    document.querySelectorAll('.filter-dropdown-toggle').forEach(el => {
+      if (c.optLabelFont) el.style.fontFamily = c.optLabelFont;
+      if (c.optLabelSize) el.style.fontSize = c.optLabelSize + 'px';
+      if (c.optLabelColor) el.style.color = c.optLabelColor;
+      if (c.optLabelWeight) el.style.fontWeight = c.optLabelWeight;
+      if (c.optLabelTransform) el.style.textTransform = c.optLabelTransform;
+    });
     
     // Filter values
     document.querySelectorAll('.filter-value').forEach(el => {
@@ -1543,6 +1841,57 @@
       if (c.btnTransform) applyBtn.style.textTransform = c.btnTransform;
       if (c.btnRadius) applyBtn.style.borderRadius = c.btnRadius + 'px';
     }
+  }
+
+  function initFilterDropdowns() {
+    if (!document.body.dataset.filterDropdownsBound) {
+      document.body.addEventListener('click', (event) => {
+        const toggle = event.target.closest('.filter-dropdown-toggle');
+        if (!toggle) return;
+
+        const section = toggle.closest('.filter-section');
+        if (!section) return;
+
+        const sectionContainer = section.parentElement;
+        const isOpen = section.classList.contains('open');
+
+        if (sectionContainer) {
+          sectionContainer.querySelectorAll('.filter-section.open').forEach(openSection => {
+            openSection.classList.remove('open');
+          });
+        }
+
+        if (!isOpen) {
+          section.classList.add('open');
+        }
+      });
+
+      document.body.dataset.filterDropdownsBound = 'true';
+    }
+
+    sortFilterValues();
+  }
+
+  function sortFilterValues() {
+    document.querySelectorAll('.filter-section').forEach(section => {
+      const list = section.querySelector('.filter-values-list');
+      if (!list) return;
+
+      if (list.querySelector('.range-slider') || list.querySelector('input[type="number"]')) {
+        return;
+      }
+
+      const options = Array.from(list.querySelectorAll('.filter-option'));
+      if (!options.length) return;
+
+      options.sort((a, b) => {
+        const aText = (a.querySelector('.filter-value')?.textContent || '').trim().toLowerCase();
+        const bText = (b.querySelector('.filter-value')?.textContent || '').trim().toLowerCase();
+        return aText.localeCompare(bText);
+      });
+
+      options.forEach(option => list.appendChild(option));
+    });
   }
 
   /**
