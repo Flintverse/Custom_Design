@@ -83,7 +83,26 @@
       background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem;
       margin-bottom: 1rem;
     }
-    .preview-sticky { position: sticky; top: 16px; }
+    .preview-sticky {
+      position: sticky;
+      top: 16px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      align-self: flex-start;
+    }
+    /* Limit live preview mockup to 6 sections (3 cols x 2 rows) when horizontal */
+    .filter-preview-horizontal #filter-preview-sections > .filter-preview-section:nth-child(n+7) {
+      display: none;
+    }
+    .filter-preview-horizontal .filter-preview-section.open .filter-preview-values {
+      position: absolute;
+      z-index: 50;
+      margin-top: 4px;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .filter-preview-horizontal .filter-preview-section { position: relative; }
    
     .price-subsection {
       background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.7rem; margin-top: 0.55rem;
@@ -147,9 +166,25 @@
 
     .filter-preview-horizontal .filter-preview-values {
       display: none;
-      grid-template-columns: repeat(var(--filter-value-columns, 3), minmax(0, 1fr));
-      gap: 6px 10px;
-      padding-top: 6px;
+      /* Reserve enough room per cell for "name + count" without overlap */
+      grid-template-columns: repeat(var(--filter-value-columns, 3), minmax(120px, 1fr));
+      gap: 8px 14px;
+      padding: 10px;
+      margin-top: 6px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      /* Cap to ~2 rows then scroll when there are many options */
+      max-height: 120px;
+      overflow-y: auto;
+      overflow-x: auto;
+      width: max-content;
+      min-width: max(220px, calc(var(--filter-value-columns, 3) * 130px));
+      max-width: 100%;
+    }
+    .filter-preview-horizontal .filter-preview-values > label {
+      white-space: nowrap;
     }
 
     .filter-preview-select {
@@ -184,6 +219,23 @@
     /* Extra spacing for all sections */
     #grid-tab .config-box { margin-bottom: 1.25rem; }
     #filter-tab .config-box { margin-bottom: 1.25rem; }
+
+    /* Collapsible config-box (Product Grid & Card sections) */
+    #grid-tab .config-box .collapse-header {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+    }
+    #grid-tab .config-box .collapse-header .section-title { margin: 0; flex: 0 0 auto; }
+    #grid-tab .config-box .collapse-header .header-toggle { margin-left: auto; display: inline-flex; align-items: center; }
+    #grid-tab .config-box .collapse-chev {
+      background: transparent; border: none; padding: 4px; cursor: pointer;
+      color: #6b7280; transition: transform 0.2s ease;
+    }
+    #grid-tab .config-box.collapsed .collapse-chev { transform: rotate(-90deg); }
+    #grid-tab .config-box .collapse-subtext {
+      font-size: 11px; color: #6b7280; margin-top: 4px; line-height: 1.4;
+    }
+    #grid-tab .config-box.collapsed .collapse-body { display: none; }
+    #grid-tab .config-box:not(.collapsed) .collapse-subtext { display: none; }
 
     /* Preview container wrapper for grid background */
     .preview-grid-wrapper {
@@ -532,14 +584,10 @@
         <div class="config-box">
           <h2 class="section-title mb-1">Filter Layout</h2>
           <p class="text-[11px] text-gray-500 mb-2">Choose your preferred filter layout style</p>
-          <div class="grid grid-cols-4 gap-2.5">
+          <div class="grid grid-cols-3 gap-2.5">
             <div onclick="selectLayout(this)" data-layout="vertical" class="option-card rounded-lg p-2.5 bg-white border border-gray-200">
               <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="desktop" class="w-3 h-3 accent-blue-600"><span class="text-[11px] font-medium">Vertical</span></div>
               <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex"><div class="w-14 bg-blue-200/70 rounded"></div></div>
-            </div>
-            <div onclick="selectLayout(this)" data-layout="offcanvas-mobile" class="option-card rounded-lg p-2.5 bg-white border border-gray-200">
-              <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="desktop" class="w-3 h-3 accent-blue-600"><span class="text-[11px] font-medium leading-tight">Off-Canvas<br>(Mobile)</span></div>
-              <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex"><div class="w-4 bg-blue-200/70 rounded"></div></div>
             </div>
             <div onclick="selectLayout(this)" data-layout="offcanvas-desktop" class="option-card selected rounded-lg p-2.5 bg-white border border-gray-200">
               <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="desktop" checked class="w-3 h-3 accent-blue-600"><span class="text-[11px] font-medium leading-tight">Off-Canvas<br>(Desktop)</span></div>
@@ -561,6 +609,17 @@
             </select>
           </div>
           <input type="hidden" id="filter-layout" value="offcanvas-desktop">
+        </div>
+        <!-- Filter Layout (Mobile) -->
+        <div class="config-box">
+          <h2 class="section-title mb-1">Filter Layout (Mobile)</h2>
+          <p class="text-[11px] text-gray-500 mb-2">Mobile use Off-Canvas as default</p>
+          <div class="grid grid-cols-3 gap-2.5">
+            <div class="option-card selected rounded-lg p-2.5 bg-white border border-gray-200 cursor-default">
+              <div class="flex items-center gap-1.5 mb-1.5"><input type="radio" name="mobile-layout" checked class="w-3 h-3 accent-blue-600" disabled><span class="text-[11px] font-medium leading-tight">Off-Canvas<br>(Mobile)</span></div>
+              <div class="bg-blue-50 border border-blue-100 rounded-md p-2 h-24 flex"><div class="w-4 bg-blue-200/70 rounded"></div></div>
+            </div>
+          </div>
         </div>
         <!-- Filter Bar -->
         <div class="config-box">
@@ -673,7 +732,7 @@
           <h2 class="section-title mb-1.5">Filter Button</h2>
          
           <div class="font-select-wrap">
-            <label>Font Family</label>
+            <label>Font</label>
             <select id="btn-font" class="font-select" style="min-width:165px; max-width:165px;"></select>
           </div>
          
@@ -706,7 +765,7 @@
               </select>
             </div>
             <div class="ctrl-row">
-              <label>Text Color</label>
+              <label>Color</label>
               <div class="color-picker-compact">
                 <input type="color" id="btn-text-color" value="#ffffff">
                 <input type="text" id="btn-text-color-hex" value="#ffffff" readonly>
@@ -740,7 +799,7 @@
           <h3 class="section-title mb-2 pb-1.5 border-b border-gray-100">Live Preview</h3>
           <div id="filter-preview-panel" class="border border-gray-200 rounded-lg p-3.5 min-h-[450px] flex flex-col overflow-auto transition-all duration-300" style="background:#ffffff;">
             <div id="filter-preview-header-row" class="mb-2.5">
-              <div id="filter-preview-title" class="text-blue-600 text-[11px] font-bold tracking-wide uppercase">Filters</div>
+              <div id="filter-preview-title" class="text-blue-600 text-[11px] font-bold tracking-wide uppercase">Filter By</div>
               <div id="filter-preview-sections">
               <div class="filter-preview-section mb-3.5">
                 <div id="preview-opt-label-1" class="text-[13px] font-semibold mb-1.5">Category</div>
@@ -1509,7 +1568,7 @@
           </div>
          
           <div class="ctrl-row">
-            <label>Text Color</label>
+            <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="atc-text-color" value="#ffffff"><input type="text" id="atc-text-color-hex" value="#ffffff" readonly></div>
             <label style="min-width:auto;margin-left:0.3rem;">BG</label>
             <div class="color-picker-compact"><input type="color" id="atc-bg-color" value="#1f2937"><input type="text" id="atc-bg-color-hex" value="#1f2937" readonly></div>
@@ -1547,7 +1606,7 @@
           </div>
          
           <div class="ctrl-row">
-            <label>Text Color</label>
+            <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="wishlist-text-color" value="#ef4444"><input type="text" id="wishlist-text-color-hex" value="#ef4444" readonly></div>
             <label style="min-width:auto;margin-left:0.3rem;">BG</label>
             <div class="color-picker-compact"><input type="color" id="wishlist-bg-color" value="#fef2f2"><input type="text" id="wishlist-bg-color-hex" value="#fef2f2" readonly></div>
@@ -1599,7 +1658,7 @@
           </div>
          
           <div class="ctrl-row">
-            <label>Text Color</label>
+            <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="quickview-text-color" value="#ffffff"><input type="text" id="quickview-text-color-hex" value="#ffffff" readonly></div>
             <label style="min-width:auto;margin-left:0.3rem;">BG</label>
             <div class="color-picker-compact"><input type="color" id="quickview-bg-color" value="#1f2937"><input type="text" id="quickview-bg-color-hex" value="#1f2937" readonly></div>
@@ -1656,7 +1715,7 @@
           </div>
          
           <div class="ctrl-row">
-            <label>Text Color</label>
+            <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="sale-text-color" value="#ffffff"><input type="text" id="sale-text-color-hex" value="#ffffff" readonly></div>
             <label style="min-width:auto;margin-left:0.3rem;">BG</label>
             <div class="color-picker-compact"><input type="color" id="sale-bg-color" value="#16a34a"><input type="text" id="sale-bg-color-hex" value="#16a34a" readonly></div>
@@ -1700,7 +1759,7 @@
           </div>
          
           <div class="ctrl-row">
-            <label>Text Color</label>
+            <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="soldout-text-color" value="#ffffff"><input type="text" id="soldout-text-color-hex" value="#ffffff" readonly></div>
             <label style="min-width:auto;margin-left:0.3rem;">BG</label>
             <div class="color-picker-compact"><input type="color" id="soldout-bg-color" value="#374151"><input type="text" id="soldout-bg-color-hex" value="#374151" readonly></div>
@@ -1748,7 +1807,7 @@
           </div>
          
           <div class="ctrl-row">
-            <label>Text Color</label>
+            <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="lowstock-text-color" value="#ffffff"><input type="text" id="lowstock-text-color-hex" value="#ffffff" readonly></div>
             <label style="min-width:auto;margin-left:0.3rem;">BG</label>
             <div class="color-picker-compact"><input type="color" id="lowstock-bg-color" value="#ea580c"><input type="text" id="lowstock-bg-color-hex" value="#ea580c" readonly></div>
@@ -2004,27 +2063,58 @@ function updateFilterPreview() {
   panel.style.setProperty('--filter-gap', gapMap[columns] || '10px');
 
   const previewTitle = document.getElementById('filter-preview-title');
-  if (previewTitle) previewTitle.textContent = layout === 'horizontal' ? 'Filter by:' : 'Filters';
+  if (previewTitle) previewTitle.textContent = 'Filter By';
   
-  // Apply filter bar width
-  const barWidth = document.getElementById('filter-bar-width').value;
-  panel.style.width = barWidth + 'px';
-  panel.style.minWidth = barWidth + 'px';
-  panel.style.maxWidth = barWidth + 'px';
-  
+  // Apply filter bar width — VERTICAL/OFFCANVAS only (horizontal is full width)
+  const barWidthInput = document.getElementById('filter-bar-width');
+  const barWidth = barWidthInput.value;
+  if (layout === 'horizontal') {
+    panel.style.width = '100%';
+    panel.style.minWidth = '';
+    panel.style.maxWidth = '';
+    barWidthInput.disabled = true;
+    barWidthInput.style.opacity = '0.4';
+  } else {
+    panel.style.width = barWidth + 'px';
+    panel.style.minWidth = barWidth + 'px';
+    panel.style.maxWidth = barWidth + 'px';
+    barWidthInput.disabled = false;
+    barWidthInput.style.opacity = '';
+  }
+
+  // Filter Option Label settings ALSO drive the "Filter By" header
+  const optFontSize = document.getElementById('opt-font-size').value+'px';
+  const optTransform = document.getElementById('opt-transform').value;
+  const optColor = document.getElementById('opt-color').value;
+  const optFont = document.getElementById('opt-font').value;
+  const optWeight = document.getElementById('opt-weight').value;
+  if (previewTitle) {
+    previewTitle.style.fontSize = optFontSize;
+    previewTitle.style.textTransform = optTransform;
+    previewTitle.style.color = optColor;
+    previewTitle.style.fontFamily = optFont;
+    previewTitle.style.fontWeight = optWeight;
+  }
   document.querySelectorAll('[id^="preview-opt-label"]').forEach(el => {
-    el.style.fontSize = document.getElementById('opt-font-size').value+'px';
-    el.style.textTransform = document.getElementById('opt-transform').value;
-    el.style.color = document.getElementById('opt-color').value;
-    el.style.fontFamily = document.getElementById('opt-font').value;
-    el.style.fontWeight = document.getElementById('opt-weight').value;
+    el.style.fontSize = optFontSize;
+    el.style.textTransform = optTransform;
+    el.style.color = optColor;
+    el.style.fontFamily = optFont;
+    el.style.fontWeight = optWeight;
   });
-  document.querySelectorAll('[id^="preview-val-"]').forEach(el => {
-    el.style.fontSize = document.getElementById('val-font-size').value+'px';
-    el.style.textTransform = document.getElementById('val-transform').value;
-    el.style.color = document.getElementById('val-color').value;
-    el.style.fontFamily = document.getElementById('val-font').value;
-    el.style.fontWeight = document.getElementById('val-weight').value;
+
+  // Filter Value settings ALSO drive the value count badge
+  const valFontSize = document.getElementById('val-font-size').value+'px';
+  const valTransform = document.getElementById('val-transform').value;
+  const valColor = document.getElementById('val-color').value;
+  const valFont = document.getElementById('val-font').value;
+  const valWeight = document.getElementById('val-weight').value;
+  document.querySelectorAll('[id^="preview-val-"], #filter-preview-panel .count-badge, #filter-preview-panel .filter-preview-values label span').forEach(el => {
+    el.style.fontSize = valFontSize;
+    el.style.textTransform = valTransform;
+    el.style.color = valColor;
+    el.style.fontFamily = valFont;
+    el.style.fontWeight = valWeight;
   });
   const btn = document.getElementById('preview-btn');
   btn.textContent = 'Apply Filters';
@@ -3096,6 +3186,95 @@ window.onload = () => {
   console.log('🔗 Live Sync: ON (saves to localStorage key: "' + STORAGE_KEY + '")');
   console.log('💡 Open StoreFront.html in another tab to see live updates!');
 };
+
+// ==================== COLLAPSIBLE PRODUCT GRID & CARD SECTIONS ====================
+// Default-collapsed config boxes in #grid-tab. Header shows title + on/off (if any) +
+// chevron at top right. Subtext (first <p> after title, if any) shown when collapsed.
+function initGridCollapsibles() {
+  const tab = document.getElementById('grid-tab');
+  if (!tab) return;
+  tab.querySelectorAll(':scope > .grid-layout-container > .grid-left-panel > .config-box').forEach(box => {
+    if (box.dataset.collapseInit === '1') return;
+    const title = box.querySelector(':scope > .section-title, :scope > div > .section-title');
+    if (!title) return;
+
+    // Locate any existing on/off toggle inside the box (toggle-switch wrapper)
+    const toggle = box.querySelector('.toggle-switch');
+
+    // First descriptive <p> right under title, if any → use as subtext while collapsed
+    let subtextSrc = null;
+    const titleParent = title.parentElement;
+    let cursor = title.nextElementSibling;
+    while (cursor && cursor.tagName !== 'P') cursor = cursor.nextElementSibling;
+    if (cursor && cursor.tagName === 'P') subtextSrc = cursor;
+
+    // Build header
+    const header = document.createElement('div');
+    header.className = 'collapse-header';
+    const titleClone = title.cloneNode(true);
+    titleClone.classList.remove('mb-1','mb-1.5','mb-2','mb-3');
+    header.appendChild(titleClone);
+    if (toggle) {
+      const wrap = document.createElement('span');
+      wrap.className = 'header-toggle';
+      // Move (don't clone) the actual toggle so its input keeps state/handlers
+      const toggleParent = toggle.parentElement;
+      wrap.appendChild(toggle);
+      header.appendChild(wrap);
+      // If parent header row becomes empty, drop it
+      if (toggleParent && toggleParent !== box && toggleParent.children.length === 0) {
+        toggleParent.remove();
+      }
+    }
+    const chev = document.createElement('button');
+    chev.type = 'button';
+    chev.className = 'collapse-chev';
+    chev.setAttribute('aria-label','Toggle section');
+    chev.innerHTML = '<i class="fas fa-chevron-down"></i>';
+    if (!toggle) header.style.justifyContent = 'space-between';
+    header.appendChild(chev);
+
+    // Build body wrapper containing all original children
+    const body = document.createElement('div');
+    body.className = 'collapse-body';
+    while (box.firstChild) body.appendChild(box.firstChild);
+    // Remove the original title (and its wrapper if it only held title+toggle)
+    const origTitle = body.querySelector('.section-title');
+    if (origTitle) {
+      const op = origTitle.parentElement;
+      origTitle.remove();
+      if (op && op !== body && op.children.length === 0) op.remove();
+    }
+
+    // Subtext shown when collapsed
+    let subtextEl = null;
+    if (subtextSrc) {
+      subtextEl = document.createElement('div');
+      subtextEl.className = 'collapse-subtext';
+      subtextEl.innerHTML = subtextSrc.innerHTML;
+    }
+
+    box.appendChild(header);
+    if (subtextEl) box.appendChild(subtextEl);
+    box.appendChild(body);
+    box.classList.add('collapsed');
+
+    const toggleFn = (e) => {
+      // Don't toggle when clicking the on/off switch itself
+      if (e.target.closest('.toggle-switch')) return;
+      box.classList.toggle('collapsed');
+    };
+    header.addEventListener('click', toggleFn);
+    box.dataset.collapseInit = '1';
+  });
+}
+document.addEventListener('DOMContentLoaded', initGridCollapsibles);
+// In case grid-tab is rendered after init, re-run when user opens it
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-tab="grid"], .tab-btn')) {
+    setTimeout(initGridCollapsibles, 50);
+  }
+});
 </script>
 </body>
 </html>
