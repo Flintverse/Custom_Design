@@ -276,6 +276,22 @@
       display: block;
     }
 
+    /* Vertical filter layout — stack values vertically (labels are inline by default) */
+    #filter-panel:not(.filter-horizontal) .filter-values-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #filter-panel:not(.filter-horizontal) .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #filter-panel:not(.filter-horizontal) .filter-values-list.px-1 {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
     /* Horizontal filter layout */
     #filter-panel.filter-horizontal {
       width: 100% !important;
@@ -296,11 +312,17 @@
       white-space: nowrap;
     }
     #filter-panel.filter-horizontal .filter-sections {
-      display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
+      display: flex;
+      flex-wrap: wrap;
       gap: var(--filter-gap, 12px);
       align-items: start;
+      /* Cap to 2 rows of filter toggles; remaining rows scroll inside */
+      max-height: calc(2 * 40px + var(--filter-gap, 12px) + 4px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 4px;
     }
+    #filter-panel.filter-horizontal .filter-section { flex: 0 0 auto; }
     #filter-panel.filter-horizontal .filter-section {
       min-width: 0;
       position: relative;
@@ -324,22 +346,24 @@
     }
     #filter-panel.filter-horizontal .filter-section.open .filter-values-list {
       display: grid;
-      position: absolute;
-      left: 0;
-      top: calc(100% + 6px);
-      grid-template-columns: repeat(var(--filter-value-columns, 1), minmax(0, 1fr));
-      gap: 6px 10px;
-      padding: 10px;
-      min-width: 220px;
+      position: fixed;
+      /* Each column reserves enough room for value name + count without crowding */
+      grid-template-columns: repeat(var(--filter-value-columns, 1), minmax(140px, 1fr));
+      gap: 8px 16px;
+      padding: 12px;
+      /* Width scales with column count so 5-6 columns stay airy and never overlap */
+      min-width: max(220px, calc(var(--filter-value-columns, 1) * 150px));
       width: max-content;
-      max-width: 480px;
+      max-width: min(92vw, calc(var(--filter-value-columns, 1) * 220px));
       background: #ffffff;
       border: 1px solid #e5e7eb;
       border-radius: 10px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      z-index: 50;
-      max-height: 260px;
-      overflow: auto;
+      z-index: 1000;
+      /* Cap to ~2 rows + a peek so long lists become scrollable */
+      max-height: 132px;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     #filter-panel.filter-horizontal .filter-option {
@@ -379,17 +403,7 @@
       border: 1px solid #e5e7eb;
     }
 
-    @media (max-width: 1200px) {
-      #filter-panel.filter-horizontal .filter-sections {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 900px) {
-      #filter-panel.filter-horizontal .filter-sections {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-    }
+    /* horizontal section list flows naturally; no responsive grid override needed */
 
     /* Sold out overlay */
     .sold-out-overlay {
@@ -1769,10 +1783,17 @@
     const sidebar = document.getElementById('filter-sidebar');
     const isHorizontal = c.filterLayout === 'horizontal';
     
-    if (panel && c.filterBarBg && !isHorizontal) {
+    // Filter bar background applies to BOTH vertical and horizontal so the
+    // chosen color stays consistent when switching layouts.
+    if (panel && c.filterBarBg) {
       panel.style.backgroundColor = c.filterBarBg;
-    } else if (panel && isHorizontal) {
-      panel.style.backgroundColor = 'transparent';
+      if (isHorizontal) {
+        panel.style.padding = '12px 16px';
+        panel.style.borderRadius = '10px';
+      } else {
+        panel.style.padding = '';
+        panel.style.borderRadius = '';
+      }
     }
 
     if (c.filterBarWidth && !isHorizontal) {
@@ -1845,6 +1866,26 @@
 
   function initFilterDropdowns() {
     if (!document.body.dataset.filterDropdownsBound) {
+      const positionDropdown = (section) => {
+        const toggle = section.querySelector('.filter-dropdown-toggle');
+        const list = section.querySelector('.filter-values-list');
+        if (!toggle || !list) return;
+        const rect = toggle.getBoundingClientRect();
+        // Render first to measure, then center under the toggle
+        list.style.visibility = 'hidden';
+        list.style.left = '0px';
+        list.style.top = (rect.bottom + 6) + 'px';
+        requestAnimationFrame(() => {
+          const listW = list.offsetWidth;
+          const vw = window.innerWidth;
+          let left = rect.left + (rect.width / 2) - (listW / 2);
+          // Clamp within viewport with 8px margin
+          left = Math.max(8, Math.min(left, vw - listW - 8));
+          list.style.left = left + 'px';
+          list.style.visibility = '';
+        });
+      };
+
       document.body.addEventListener('click', (event) => {
         const toggle = event.target.closest('.filter-dropdown-toggle');
         if (!toggle) return;
@@ -1863,8 +1904,16 @@
 
         if (!isOpen) {
           section.classList.add('open');
+          requestAnimationFrame(() => positionDropdown(section));
         }
       });
+
+      // Reposition on scroll/resize
+      const repositionAllOpen = () => {
+        document.querySelectorAll('#filter-panel.filter-horizontal .filter-section.open').forEach(positionDropdown);
+      };
+      window.addEventListener('scroll', repositionAllOpen, true);
+      window.addEventListener('resize', repositionAllOpen);
 
       document.body.dataset.filterDropdownsBound = 'true';
     }
@@ -1959,50 +2008,25 @@
    * FIX #4: Toolbar Styles - Labels, sort dropdown, etc.
    */
   function applyToolbarStyles(c) {
-    // Filter labels in toolbar
-    const sizeLabel = document.getElementById('filter-label-size');
-    if (sizeLabel && c.valFont) sizeLabel.style.fontFamily = c.valFont;
-    if (sizeLabel && c.valSize) sizeLabel.style.fontSize = c.valSize + 'px';
-    if (sizeLabel && c.valColor) sizeLabel.style.color = c.valColor;
-    
-    const tagLabel = document.getElementById('filter-label-tag');
-    if (tagLabel && c.valFont) tagLabel.style.fontFamily = c.valFont;
-    if (tagLabel && c.valSize) tagLabel.style.fontSize = c.valSize + 'px';
-    if (tagLabel && c.valColor) tagLabel.style.color = c.valColor;
-    
-    // Clear all button
-    const clearBtn = document.getElementById('clear-all-btn');
-    if (clearBtn) {
-      if (c.valFont) clearBtn.style.fontFamily = c.valFont;
-      if (c.valSize) clearBtn.style.fontSize = c.valSize + 'px';
-      if (c.valColor) clearBtn.style.color = c.valColor;
-    }
-    
-    // Sort label
-    const sortLabel = document.getElementById('sort-label');
-    if (sortLabel && c.valFont) sortLabel.style.fontFamily = c.valFont;
-    if (sortLabel && c.valSize) sortLabel.style.fontSize = c.valSize + 'px';
-    if (sortLabel && c.valColor) sortLabel.style.color = c.valColor;
-    
-    // Sort select
-    const sortSelect = document.getElementById('sort-select');
-    if (sortSelect) {
-      if (c.valFont) sortSelect.style.fontFamily = c.valFont;
-      if (c.valSize) sortSelect.style.fontSize = c.valSize + 'px';
-      if (c.valColor) sortSelect.style.color = c.valColor;
-    }
-    
-    // Product count
-    const prodCount = document.getElementById('product-count');
-    if (prodCount && c.valFont) prodCount.style.fontFamily = c.valFont;
-    if (prodCount && c.valSize) prodCount.style.fontSize = c.valSize + 'px';
-    if (prodCount && c.valColor) prodCount.style.color = c.valColor;
-    
-    // Active filter tags
-    document.querySelectorAll('.active-filter-tag').forEach(tag => {
-      if (c.valFont) tag.style.fontFamily = c.valFont;
-      if (c.valSize) tag.style.fontSize = c.valSize + 'px';
-    });
+    const applyVal = (el) => {
+      if (!el) return;
+      if (c.valFont) el.style.fontFamily = c.valFont;
+      if (c.valSize) el.style.fontSize = c.valSize + 'px';
+      if (c.valColor) el.style.color = c.valColor;
+      if (c.valWeight) el.style.fontWeight = c.valWeight;
+      if (c.valTransform) el.style.textTransform = c.valTransform;
+    };
+
+    applyVal(document.getElementById('filter-label-size'));
+    applyVal(document.getElementById('filter-label-tag'));
+    applyVal(document.getElementById('clear-all-btn'));
+    applyVal(document.getElementById('sort-label'));
+    applyVal(document.getElementById('sort-select'));
+    applyVal(document.getElementById('product-count'));
+
+    document.querySelectorAll('#sort-select option').forEach(applyVal);
+    document.querySelectorAll('.active-filter-tag').forEach(applyVal);
+    document.querySelectorAll('.active-filter-tag .filter-value, .active-filter-tag span').forEach(applyVal);
   }
 
   /**
