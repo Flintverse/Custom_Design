@@ -1010,13 +1010,13 @@
           <div class="flex flex-wrap items-center justify-between gap-4 mb-6" id="toolbar-area">
             <!-- Active Filters (populated dynamically when user selects filter values) -->
             <div class="flex flex-wrap items-center gap-2" id="active-filters-area">
-              <button id="clear-all-btn" class="text-sm text-blue-600 hover:text-blue-800 font-medium ml-2 underline" style="display:none;">Clear all</button>
+              <button id="clear-all-btn" class="text-sm text-gray-900 hover:text-gray-700 font-medium ml-2 underline" style="display:none;">Clear all</button>
             </div>
 
             <!-- Sort Dropdown -->
             <div class="flex items-center gap-3" id="sort-by-area">
-              <label id="sort-label" class="text-sm font-medium text-gray-700 whitespace-nowrap">Sort by</label>
-              <select id="sort-select" class="pl-3 pr-8 py-2 border border-gray-300 rounded-md text-sm bg-white focus:border-blue-500 focus:outline-none cursor-pointer">
+              <label id="sort-label" class="text-sm font-medium text-gray-900 whitespace-nowrap">Sort by</label>
+              <select id="sort-select" class="pl-3 pr-8 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:border-blue-500 focus:outline-none cursor-pointer">
                 <option>What's New?</option>
                 <option>Price: Low to High</option>
                 <option>Price: High to Low</option>
@@ -1027,7 +1027,7 @@
           </div>
 
           <!-- Product Count -->
-          <div id="product-count" class="text-sm text-gray-500 mb-4">9 products</div>
+          <div id="product-count" class="text-sm text-gray-900 mb-4">9 products</div>
 
           <!-- ==================== PRODUCT GRID ==================== -->
           <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1804,7 +1804,7 @@
     // Filter bar background applies to BOTH vertical and horizontal so the
     // chosen color stays consistent when switching layouts.
     if (panel && c.filterBarBg) {
-      panel.style.backgroundColor = c.filterBarBg;
+      panel.style.backgroundColor = isHorizontal ? 'transparent' : c.filterBarBg;
       if (isHorizontal) {
         panel.style.padding = '12px 16px';
         panel.style.borderRadius = '10px';
@@ -2026,6 +2026,14 @@
    * FIX #4: Toolbar Styles - Labels, sort dropdown, etc.
    */
   function applyToolbarStyles(c) {
+    const resetStatic = (el) => {
+      if (!el) return;
+      el.style.fontFamily = '';
+      el.style.fontSize = '';
+      el.style.color = '';
+      el.style.fontWeight = '';
+      el.style.textTransform = '';
+    };
     const applyVal = (el) => {
       if (!el) return;
       if (c.valFont) el.style.fontFamily = c.valFont;
@@ -2035,14 +2043,11 @@
       if (c.valTransform) el.style.textTransform = c.valTransform;
     };
 
-    applyVal(document.getElementById('filter-label-size'));
-    applyVal(document.getElementById('filter-label-tag'));
-    applyVal(document.getElementById('clear-all-btn'));
-    applyVal(document.getElementById('sort-label'));
-    applyVal(document.getElementById('sort-select'));
-    applyVal(document.getElementById('product-count'));
-
-    document.querySelectorAll('#sort-select option').forEach(applyVal);
+    resetStatic(document.getElementById('clear-all-btn'));
+    resetStatic(document.getElementById('sort-label'));
+    resetStatic(document.getElementById('sort-select'));
+    resetStatic(document.getElementById('product-count'));
+    document.querySelectorAll('#sort-select option').forEach(resetStatic);
     document.querySelectorAll('.active-filter-tag').forEach(applyVal);
     document.querySelectorAll('.active-filter-tag .filter-value, .active-filter-tag span').forEach(applyVal);
   }
