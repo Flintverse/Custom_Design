@@ -86,12 +86,10 @@
     .preview-sticky {
       position: sticky;
       top: 16px;
-      max-height: calc(100vh - 32px);
-      overflow-y: auto;
       align-self: flex-start;
     }
-    /* Limit live preview mockup to 3 sections (1 row only) when horizontal */
-    .filter-preview-horizontal #filter-preview-sections > .filter-preview-section:nth-child(n+4) {
+    /* Show only first 4 sections (2 rows × 2) when horizontal */
+    .filter-preview-horizontal #filter-preview-sections > .filter-preview-section:nth-child(n+5) {
       display: none;
     }
     .filter-preview-horizontal .filter-preview-section.open .filter-preview-values {
@@ -99,11 +97,10 @@
       z-index: 50;
       margin-top: 4px;
       top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 0;
     }
     .filter-preview-horizontal .filter-preview-section { position: relative; }
-   
+
     .price-subsection {
       background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.7rem; margin-top: 0.55rem;
     }
@@ -111,7 +108,7 @@
       display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;
     }
     .price-subheader span { font-size: 0.73rem; font-weight: 600; color: #1f2937; }
-   
+
     .badge-zone {
       position: absolute; display: flex; flex-direction: column; gap: 3px; z-index: 20; pointer-events: none;
     }
@@ -119,7 +116,7 @@
     .badge-zone.tr { top: 6px; right: 6px; align-items: flex-end; }
     .badge-zone.bl { bottom: 6px; left: 6px; align-items: flex-start; }
     .badge-zone.br { bottom: 6px; right: 6px; align-items: flex-end; }
-   
+
     .preview-badge {
       padding: 2px 7px; font-size: 9px; font-weight: 600; border-radius: 3px;
       white-space: nowrap; line-height: 1.3;
@@ -129,40 +126,34 @@
       appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #2563eb;
       cursor: pointer; border: 2px solid white; box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
-   
+
     .micro-select { font-size: 0.68rem !important; padding: 0.18rem 0.35rem !important; border-width: 1.5px !important; min-width: auto; }
-   
+
     .count-badge {
       display: inline-flex; align-items: center; justify-content: center;
-      background: #e5e7eb; color: #6b7280; font-size: 0.62rem; font-weight: 600;
-      padding: 0 5px; border-radius: 10px; margin-left: auto; min-width: 18px; text-align: center;
+      background: transparent; color: #6b7280; font-size: 0.62rem; font-weight: 600;
+      padding: 0 4px; margin-left: auto; min-width: 18px; text-align: center;
     }
 
+    /* Horizontal layout — same preview panel, sections wrap to 2 rows × 2 */
+    .filter-preview-horizontal #filter-preview-header-row {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .filter-preview-horizontal #filter-preview-title {
+      display: block;
+      margin: 0 0 8px 0;
+      white-space: nowrap;
+    }
     .filter-preview-horizontal #filter-preview-sections {
       display: flex;
-      flex: 1 1 auto;
-      flex-wrap: nowrap;
-      align-items: center;
-      gap: var(--filter-gap, 8px);
-      min-width: 0;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 8px;
     }
-
-    .filter-preview-horizontal #filter-preview-header-row {
-      display: flex;
-      align-items: center;
-      flex-wrap: nowrap;
-      gap: 10px;
-      margin-bottom: 0;
-    }
-
-    .filter-preview-horizontal #filter-preview-title {
-      margin: 0;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
     .filter-preview-horizontal .filter-preview-section {
-      flex: 1 1 0;
+      flex: 0 0 calc((100% - 8px) / 2);
+      max-width: calc((100% - 8px) / 2);
       min-width: 0;
       margin-bottom: 0;
     }
@@ -178,43 +169,47 @@
 
     .filter-preview-horizontal .filter-preview-values {
       display: none;
-      grid-template-columns: repeat(var(--filter-value-columns, 3), minmax(0, 1fr));
-      gap: 4px 10px;
-      padding: 8px 10px;
+      grid-template-columns: repeat(var(--filter-value-columns, 2), minmax(0, 1fr));
+      gap: 2px 8px;
+      padding: 6px 8px;
       margin-top: 4px;
       background: #ffffff;
       border: 1px solid #e5e7eb;
       border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      max-height: 140px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      max-height: 220px;
       overflow-y: auto;
       width: max-content;
-      min-width: calc(var(--filter-value-columns, 3) * 90px);
-      max-width: 360px;
-      font-size: 10px;
+      min-width: 100%;
+      max-width: 420px;
+      font-size: 11px;
     }
     .filter-preview-horizontal .filter-preview-values > label {
       white-space: nowrap;
+      gap: 4px;
     }
     .filter-preview-horizontal .filter-preview-values label span {
-      font-size: 10px !important;
+      font-size: 11px !important;
     }
     .filter-preview-horizontal .filter-preview-values .count-badge {
-      font-size: 9px !important;
-      padding: 0 4px;
-      min-width: 14px;
+      font-size: 10.5px !important;
+      padding: 0 3px;
+      min-width: 16px;
     }
 
     .filter-preview-select {
       width: 100%;
       border: 1px solid #d1d5db;
       border-radius: 5px;
-      font-size: 0.62rem;
-      padding: 0.22rem 0.4rem;
+      font-size: 0.6rem;
+      padding: 0.2rem 0.35rem;
       background: white;
       display: none;
       min-width: 0;
       text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .filter-preview-select:focus {
@@ -575,7 +570,7 @@
   </style>
 </head>
 <body class="bg-gray-100 antialiased">
-<div class="max-w-7xl mx-auto my-5 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+<div class="max-w-[1760px] mx-auto my-5 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
   <!-- Header -->
   <div class="flex justify-between items-center px-8 py-3 border-b border-gray-200 bg-gray-50/60">
     <div class="flex items-center gap-3">
@@ -592,8 +587,8 @@
   </div>
   <!-- ==================== FILTER DESIGN TAB ==================== -->
   <div id="filter-tab" class="tab-content">
-    <div class="flex gap-5 p-5 bg-gray-50/50">
-      <div class="flex-1 min-w-0 space-y-4">
+    <div class="flex gap-5 p-5 bg-gray-50/50 items-start">
+      <div id="filter-settings-col" class="space-y-4" style="flex: 1 1 600px; min-width: 0;">
         <!-- Filter Layout -->
         <div class="config-box">
           <h2 class="section-title mb-1">Filter Layout</h2>
@@ -615,8 +610,8 @@
           <div id="horizontal-columns-row" class="ctrl-row hidden mt-3">
             <label>Horizontal Columns</label>
             <select id="horizontal-columns" class="micro-select w-24">
-              <option value="2">2</option>
-              <option value="3" selected>3</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="6">6</option>
@@ -678,8 +673,7 @@
             <div class="ctrl-row">
               <label>Weight</label>
               <select id="opt-weight" class="micro-select w-28">
-                <option value="300">Light</option>
-                <option value="400" selected>Regular</option>
+                  <option value="400" selected>Regular</option>
                 <option value="700">Bold</option>
               </select>
             </div>
@@ -689,8 +683,7 @@
                 <option value="none">None</option>
                 <option value="capitalize">Capitalize</option>
                 <option value="uppercase">Uppercase</option>
-                <option value="lowercase">Lowercase</option>
-              </select>
+                </select>
             </div>
             <div class="ctrl-row mb-0">
               <label>Color</label>
@@ -719,8 +712,7 @@
             <div class="ctrl-row">
               <label>Weight</label>
               <select id="val-weight" class="micro-select w-28">
-                <option value="300">Light</option>
-                <option value="400" selected>Regular</option>
+                  <option value="400" selected>Regular</option>
                 <option value="700">Bold</option>
               </select>
             </div>
@@ -730,8 +722,7 @@
                 <option value="none">None</option>
                 <option value="capitalize">Capitalize</option>
                 <option value="uppercase">Uppercase</option>
-                <option value="lowercase">Lowercase</option>
-              </select>
+                </select>
             </div>
             <div class="ctrl-row mb-0">
               <label>Color</label>
@@ -760,8 +751,7 @@
             <div class="ctrl-row">
               <label>Weight</label>
               <select id="btn-weight" class="micro-select w-28">
-                <option value="300">Light</option>
-                <option value="400" selected>Regular</option>
+                  <option value="400" selected>Regular</option>
                 <option value="700">Bold</option>
               </select>
             </div>
@@ -776,8 +766,7 @@
                 <option value="none">None</option>
                 <option value="capitalize">Capitalize</option>
                 <option value="uppercase">Uppercase</option>
-                <option value="lowercase">Lowercase</option>
-              </select>
+                </select>
             </div>
             <div class="ctrl-row">
               <label>Color</label>
@@ -809,8 +798,8 @@
         </div>
       </div>
       <!-- Right Preview -->
-      <div id="filter-preview-col" class="flex-shrink-0" style="width: 280px;">
-        <div class="preview-sticky config-box shadow-md">
+      <div id="filter-preview-col" style="flex: 0 0 auto; min-width: 0; align-self: flex-start;">
+        <div id="filter-preview-card" class="preview-sticky config-box shadow-md" style="margin-bottom: 0;">
           <h3 class="section-title mb-2 pb-1.5 border-b border-gray-100">Live Preview</h3>
           <div id="filter-preview-panel" class="border border-gray-200 rounded-lg p-3.5 min-h-[450px] flex flex-col overflow-y-auto overflow-x-hidden transition-all duration-300" style="background:#ffffff;">
             <div id="filter-preview-header-row" class="mb-2.5">
@@ -823,29 +812,29 @@
                   <label class="flex items-center gap-1.5 cursor-pointer group">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-1" class="text-[13px] flex-1">T-Shirts</span>
-                    <span class="count-badge">24</span>
+                    <span class="count-badge">(24)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer group">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-2" class="text-[13px] flex-1">Hoodies</span>
-                    <span class="count-badge">12</span>
+                    <span class="count-badge">(12)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer group">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Jackets</span>
-                    <span class="count-badge">8</span>
+                    <span class="count-badge">(8)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer group">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Pants</span>
-                    <span class="count-badge">31</span>
+                    <span class="count-badge">(31)</span>
                   </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Shirts</span><span class="count-badge">19</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Dresses</span><span class="count-badge">14</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Skirts</span><span class="count-badge">9</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Shorts</span><span class="count-badge">17</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Sweaters</span><span class="count-badge">11</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Coats</span><span class="count-badge">7</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Shirts</span><span class="count-badge">(19)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Dresses</span><span class="count-badge">(14)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Skirts</span><span class="count-badge">(9)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Shorts</span><span class="count-badge">(17)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Sweaters</span><span class="count-badge">(11)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer group"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Coats</span><span class="count-badge">(7)</span></label>
                 </div>
               </div>
              
@@ -855,30 +844,30 @@
                 <div class="filter-preview-values">
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
-                    <span id="preview-val-4" class="text-[13px] flex-1">$0 — $50</span>
-                    <span class="count-badge">45</span>
+                    <span id="preview-val-4" class="text-[13px] flex-1">$0-50</span>
+                    <span class="count-badge">(45)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                    <span id="preview-val-5" class="text-[13px] flex-1">$50 — $150</span>
-                    <span class="count-badge">67</span>
+                    <span id="preview-val-5" class="text-[13px] flex-1">$50-150</span>
+                    <span class="count-badge">(67)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                    <span class="text-[13px] flex-1">$150 — $300</span>
-                    <span class="count-badge">23</span>
+                    <span class="text-[13px] flex-1">$150-300</span>
+                    <span class="count-badge">(23)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">$300+</span>
-                    <span class="count-badge">11</span>
+                    <span class="count-badge">(11)</span>
                   </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Under $25</span><span class="count-badge">29</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$25 — $75</span><span class="count-badge">38</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$75 — $200</span><span class="count-badge">42</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$200 — $500</span><span class="count-badge">15</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$500 — $1000</span><span class="count-badge">8</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$1000+</span><span class="count-badge">3</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1"><$25</span><span class="count-badge">(29)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$25-75</span><span class="count-badge">(38)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$75-200</span><span class="count-badge">(42)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$200-500</span><span class="count-badge">(15)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$500-1K</span><span class="count-badge">(8)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">$1K+</span><span class="count-badge">(3)</span></label>
                 </div>
               </div>
              
@@ -889,29 +878,29 @@
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-6" class="text-[13px] flex-1">Black</span>
-                    <span class="count-badge">89</span>
+                    <span class="count-badge">(89)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-7" class="text-[13px] flex-1">White</span>
-                    <span class="count-badge">56</span>
+                    <span class="count-badge">(56)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Navy</span>
-                    <span class="count-badge">34</span>
+                    <span class="count-badge">(34)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Red</span>
-                    <span class="count-badge">19</span>
+                    <span class="count-badge">(19)</span>
                   </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Blue</span><span class="count-badge">47</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Green</span><span class="count-badge">22</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Grey</span><span class="count-badge">61</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Beige</span><span class="count-badge">28</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Pink</span><span class="count-badge">14</span></label>
-                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Yellow</span><span class="count-badge">9</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Blue</span><span class="count-badge">(47)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Green</span><span class="count-badge">(22)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Grey</span><span class="count-badge">(61)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Beige</span><span class="count-badge">(28)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Pink</span><span class="count-badge">(14)</span></label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3"><span class="text-[13px] flex-1">Yellow</span><span class="count-badge">(9)</span></label>
                 </div>
               </div>
               <div class="filter-preview-section mb-3.5">
@@ -921,17 +910,17 @@
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-8" class="text-[13px] flex-1">Small</span>
-                    <span class="count-badge">18</span>
+                    <span class="count-badge">(18)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-9" class="text-[13px] flex-1">Medium</span>
-                    <span class="count-badge">26</span>
+                    <span class="count-badge">(26)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Large</span>
-                    <span class="count-badge">22</span>
+                    <span class="count-badge">(22)</span>
                   </label>
                 </div>
               </div>
@@ -942,17 +931,17 @@
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-10" class="text-[13px] flex-1">Nike</span>
-                    <span class="count-badge">42</span>
+                    <span class="count-badge">(42)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Adidas</span>
-                    <span class="count-badge">38</span>
+                    <span class="count-badge">(38)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Puma</span>
-                    <span class="count-badge">27</span>
+                    <span class="count-badge">(27)</span>
                   </label>
                 </div>
               </div>
@@ -963,17 +952,17 @@
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-11" class="text-[13px] flex-1">Cotton</span>
-                    <span class="count-badge">34</span>
+                    <span class="count-badge">(34)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-12" class="text-[13px] flex-1">Linen</span>
-                    <span class="count-badge">15</span>
+                    <span class="count-badge">(15)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Blend</span>
-                    <span class="count-badge">21</span>
+                    <span class="count-badge">(21)</span>
                   </label>
                 </div>
               </div>
@@ -984,17 +973,17 @@
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-13" class="text-[13px] flex-1">Classic</span>
-                    <span class="count-badge">28</span>
+                    <span class="count-badge">(28)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Sport</span>
-                    <span class="count-badge">17</span>
+                    <span class="count-badge">(17)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Street</span>
-                    <span class="count-badge">22</span>
+                    <span class="count-badge">(22)</span>
                   </label>
                 </div>
               </div>
@@ -1005,17 +994,17 @@
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-14" class="text-[13px] flex-1">Slim</span>
-                    <span class="count-badge">12</span>
+                    <span class="count-badge">(12)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Regular</span>
-                    <span class="count-badge">31</span>
+                    <span class="count-badge">(31)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Relaxed</span>
-                    <span class="count-badge">9</span>
+                    <span class="count-badge">(9)</span>
                   </label>
                 </div>
               </div>
@@ -1026,17 +1015,17 @@
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-15" class="text-[13px] flex-1">Short</span>
-                    <span class="count-badge">29</span>
+                    <span class="count-badge">(29)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Long</span>
-                    <span class="count-badge">13</span>
+                    <span class="count-badge">(13)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
-                    <span class="text-[13px] flex-1">Sleeveless</span>
-                    <span class="count-badge">6</span>
+                    <span class="text-[13px] flex-1">None</span>
+                    <span class="count-badge">(6)</span>
                   </label>
                 </div>
               </div>
@@ -1047,17 +1036,17 @@
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span id="preview-val-16" class="text-[13px] flex-1">Solid</span>
-                    <span class="count-badge">40</span>
+                    <span class="count-badge">(40)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Stripe</span>
-                    <span class="count-badge">11</span>
+                    <span class="count-badge">(11)</span>
                   </label>
                   <label class="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" class="filter-checkbox accent-blue-600 w-3 h-3">
                     <span class="text-[13px] flex-1">Graphic</span>
-                    <span class="count-badge">14</span>
+                    <span class="count-badge">(14)</span>
                   </label>
                 </div>
               </div>
@@ -1069,6 +1058,9 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="info-note-box" id="filter-preview-note">
+          <p>Need more Filter UI Customize? <span class="contact-link" onclick="openChatWithMessage('Hi I need help with customize Filter UI')">Contact us</span> now</p>
         </div>
       </div>
     </div>
@@ -1097,7 +1089,7 @@
         <!-- Mobile Grid -->
         <div class="config-box opacity-80" data-no-collapse="1">
           <h2 class="section-title mb-1">Product Grid (Mobile)</h2>
-          <p class="text-[11px] text-gray-500 leading-relaxed">Fixed at 2 items per row. Pagination not available. <a href="#" class="text-blue-600 hover:underline">Contact us</a> for mobile customization.</p>
+          <p class="text-[11px] text-gray-500 leading-relaxed">Fixed at 2 items per row. Pagination not available. <span class="contact-link" onclick="openChatWithMessage('Hi, i need help with mobile customize')">Contact us</span> for mobile customization.</p>
         </div>
        
         <!-- General Settings -->
@@ -1249,10 +1241,8 @@
               <option value="none">None</option>
               <option value="capitalize">Capitalize</option>
               <option value="uppercase">Uppercase</option>
-              <option value="lowercase">Lowercase</option>
             </select></div>
             <div class="ctrl-row mb-0"><label>Weight</label><select id="title-weight" class="micro-select w-28">
-              <option value="300">Light</option>
               <option value="400" selected>Regular</option>
               <option value="700">Bold</option>
             </select></div>
@@ -1317,7 +1307,7 @@
                 </div>
                 
                 <div class="ctrl-row mb-0">
-                  <label class="min-w-[60px]">BG</label>
+                  <label class="min-w-[60px]">Background</label>
                   <div class="color-picker-compact">
                     <input type="color" id="sku-label-bg" value="#f3f4f6">
                     <input type="text" id="sku-label-bg-hex" value="#f3f4f6" readonly>
@@ -1327,9 +1317,7 @@
                 <div class="ctrl-row mb-0">
                   <label class="min-w-[60px]">Weight</label>
                   <select id="sku-label-weight" class="micro-select w-full">
-                    <option value="300">Light</option>
-                    <option value="400" selected>Regular</option>
-                    <option value="600">Semi Bold</option>
+                          <option value="400" selected>Regular</option>
                     <option value="700">Bold</option>
                   </select>
                 </div>
@@ -1354,7 +1342,7 @@
                 </div>
                 
                 <div class="ctrl-row mb-0">
-                  <label class="min-w-[60px]">BG</label>
+                  <label class="min-w-[60px]">Background</label>
                   <div class="color-picker-compact">
                     <input type="color" id="sku-code-bg" value="#ffffff">
                     <input type="text" id="sku-code-bg-hex" value="#ffffff" readonly>
@@ -1364,24 +1352,14 @@
                 <div class="ctrl-row mb-0">
                   <label class="min-w-[60px]">Weight</label>
                   <select id="sku-code-weight" class="micro-select w-full">
-                    <option value="300">Light</option>
-                    <option value="400" selected>Regular</option>
-                    <option value="600">Semi Bold</option>
+                          <option value="400" selected>Regular</option>
                     <option value="700">Bold</option>
                   </select>
                 </div>
               </div>
             </div>
             
-            <!-- Shared Transform -->
-            <div class="ctrl-row mt-2 pt-2 border-t border-gray-100">
-              <label>Transform</label>
-              <select id="sku-transform-full" class="micro-select w-32">
-                <option value="none">None</option>
-                <option value="uppercase">Uppercase</option>
-                <option value="capitalize">Capitalize</option>
-              </select>
-            </div>
+            
           </div>
           
           <!-- MODE: CODE ONLY -->
@@ -1401,9 +1379,7 @@
               <div class="ctrl-row mb-0">
                 <label>Weight</label>
                 <select id="sku-code-only-weight" class="micro-select w-full">
-                  <option value="300">Light</option>
-                  <option value="400" selected>Regular</option>
-                  <option value="600">Semi Bold</option>
+                      <option value="400" selected>Regular</option>
                   <option value="700">Bold</option>
                 </select>
               </div>
@@ -1424,14 +1400,7 @@
                 </div>
               </div>
               
-              <div class="ctrl-row mb-0 col-span-2">
-                <label>Transform</label>
-                <select id="sku-transform-code-only" class="micro-select w-32">
-                  <option value="none">None</option>
-                  <option value="uppercase">Uppercase</option>
-                  <option value="capitalize">Capitalize</option>
-                </select>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -1460,10 +1429,8 @@
               <option value="none">None</option>
               <option value="capitalize">Capitalize</option>
               <option value="uppercase">Uppercase</option>
-              <option value="lowercase">Lowercase</option>
             </select></div>
             <div class="ctrl-row mb-0"><label>Weight</label><select id="vendor-weight" class="micro-select w-28">
-              <option value="300">Light</option>
               <option value="400" selected>Regular</option>
               <option value="700">Bold</option>
             </select></div>
@@ -1529,8 +1496,7 @@
               <div class="grid grid-cols-2 gap-x-4 gap-y-1">
                 <div class="slider-row mb-0"><label>Size</label><input type="range" id="fixed-price-font" min="11" max="26" value="15" class="flex-1"><span id="fixed-font-val" class="slider-val">15px</span></div>
                 <div class="ctrl-row mb-0"><label>Weight</label><select id="fixed-price-weight" class="micro-select w-full">
-                  <option value="300">Light</option>
-                  <option value="400" selected>Regular</option>
+                      <option value="400" selected>Regular</option>
                   <option value="700">Bold</option>
                 </select></div>
               </div>
@@ -1555,8 +1521,7 @@
               <div class="grid grid-cols-2 gap-x-4 gap-y-1">
                 <div class="slider-row mb-0"><label>Size</label><input type="range" id="old-price-font" min="10" max="22" value="13" class="flex-1"><span id="old-font-val" class="slider-val">13px</span></div>
                 <div class="ctrl-row mb-0"><label>Weight</label><select id="old-price-weight" class="micro-select w-full">
-                  <option value="300">Light</option>
-                  <option value="400" selected>Regular</option>
+                      <option value="400" selected>Regular</option>
                   <option value="700">Bold</option>
                 </select></div>
               </div>
@@ -1581,8 +1546,7 @@
               <div class="grid grid-cols-2 gap-x-4 gap-y-1">
                 <div class="slider-row mb-0"><label>Size</label><input type="range" id="sale-price-font" min="12" max="30" value="18" class="flex-1"><span id="sale-font-val" class="slider-val">18px</span></div>
                 <div class="ctrl-row mb-0"><label>Weight</label><select id="sale-price-weight" class="micro-select w-full">
-                  <option value="300">Light</option>
-                  <option value="400" selected>Regular</option>
+                      <option value="400" selected>Regular</option>
                   <option value="700">Bold</option>
                 </select></div>
               </div>
@@ -1606,7 +1570,7 @@
           <div class="ctrl-row">
             <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="atc-text-color" value="#ffffff"><input type="text" id="atc-text-color-hex" value="#ffffff" readonly></div>
-            <label style="min-width:auto;margin-left:0.3rem;">BG</label>
+            <label style="min-width:auto;margin-left:0.3rem;">Background</label>
             <div class="color-picker-compact"><input type="color" id="atc-bg-color" value="#1f2937"><input type="text" id="atc-bg-color-hex" value="#1f2937" readonly></div>
           </div>
          
@@ -1615,14 +1579,12 @@
               <option value="none">None</option>
               <option value="capitalize">Capitalize</option>
               <option value="uppercase">Uppercase</option>
-              <option value="lowercase">Lowercase</option>
             </select></div>
             <div class="slider-row mb-0"><label>Size</label><input type="range" id="atc-font-size" min="11" max="20" value="13" class="flex-1"><span id="atc-font-val" class="slider-val">13px</span></div>
           </div>
          
           <div class="grid grid-cols-2 gap-x-4 gap-y-1">
             <div class="ctrl-row mb-0"><label>Weight</label><select id="atc-weight" class="micro-select w-full">
-              <option value="300">Light</option>
               <option value="400" selected>Regular</option>
               <option value="700">Bold</option>
             </select></div>
@@ -1644,23 +1606,16 @@
           <div class="ctrl-row">
             <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="wishlist-text-color" value="#ef4444"><input type="text" id="wishlist-text-color-hex" value="#ef4444" readonly></div>
-            <label style="min-width:auto;margin-left:0.3rem;">BG</label>
+            <label style="min-width:auto;margin-left:0.3rem;">Background</label>
             <div class="color-picker-compact"><input type="color" id="wishlist-bg-color" value="#fef2f2"><input type="text" id="wishlist-bg-color-hex" value="#fef2f2" readonly></div>
           </div>
          
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-            <div class="ctrl-row mb-0"><label>Type</label><select id="wishlist-type" class="micro-select w-full"><option value="heart">Heart Icon</option><option value="text">Text (Wishlist)</option><option value="custom">Custom</option></select></div>
-            <div class="ctrl-row mb-0"><label>Transform</label><select id="wishlist-transform" class="micro-select w-36">
-              <option value="none">None</option>
-              <option value="capitalize">Capitalize</option>
-              <option value="uppercase">Uppercase</option>
-              <option value="lowercase">Lowercase</option>
-            </select></div>
-          </div>
+          <input type="hidden" id="wishlist-type" value="heart">
+          <input type="hidden" id="wishlist-transform" value="none">
+
          
           <div class="grid grid-cols-2 gap-x-4 gap-y-1">
             <div class="ctrl-row mb-0"><label>Weight</label><select id="wishlist-weight" class="micro-select w-full">
-              <option value="300">Light</option>
               <option value="400" selected>Regular</option>
               <option value="700">Bold</option>
             </select></div>
@@ -1696,7 +1651,7 @@
           <div class="ctrl-row">
             <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="quickview-text-color" value="#ffffff"><input type="text" id="quickview-text-color-hex" value="#ffffff" readonly></div>
-            <label style="min-width:auto;margin-left:0.3rem;">BG</label>
+            <label style="min-width:auto;margin-left:0.3rem;">Background</label>
             <div class="color-picker-compact"><input type="color" id="quickview-bg-color" value="#1f2937"><input type="text" id="quickview-bg-color-hex" value="#1f2937" readonly></div>
           </div>
          
@@ -1710,13 +1665,11 @@
               <option value="none">None</option>
               <option value="capitalize">Capitalize</option>
               <option value="uppercase">Uppercase</option>
-              <option value="lowercase">Lowercase</option>
             </select></div>
           </div>
          
           <div class="grid grid-cols-2 gap-x-4 gap-y-1">
             <div class="ctrl-row mb-0"><label>Weight</label><select id="quickview-weight" class="micro-select w-full">
-              <option value="300">Light</option>
               <option value="400" selected>Regular</option>
               <option value="700">Bold</option>
             </select></div>
@@ -1753,28 +1706,24 @@
           <div class="ctrl-row">
             <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="sale-text-color" value="#ffffff"><input type="text" id="sale-text-color-hex" value="#ffffff" readonly></div>
-            <label style="min-width:auto;margin-left:0.3rem;">BG</label>
+            <label style="min-width:auto;margin-left:0.3rem;">Background</label>
             <div class="color-picker-compact"><input type="color" id="sale-bg-color" value="#16a34a"><input type="text" id="sale-bg-color-hex" value="#16a34a" readonly></div>
           </div>
          
           <div class="grid grid-cols-3 gap-x-4 gap-y-1">
             <div class="slider-row mb-0"><label>Size</label><input type="range" id="sale-font-size" min="9" max="18" value="11" class="flex-1"><span id="sale-font-size-val" class="slider-val">11px</span></div>
             <div class="ctrl-row mb-0"><label>Weight</label><select id="sale-weight" class="micro-select w-24">
-              <option value="300">Light</option>
               <option value="400" selected>Regular</option>
               <option value="700">Bold</option>
             </select></div>
             <div class="ctrl-row mb-0"><label>Position</label><select id="sale-position" class="micro-select w-24">
               <option value="top-left">Top Left</option>
               <option value="top-right">Top Right</option>
-              <option value="bottom-left">Bottom Left</option>
-              <option value="bottom-right">Bottom Right</option>
             </select></div>
             <div class="ctrl-row mb-0 col-span-3"><label>Style</label><select id="sale-style" class="micro-select w-44">
               <option value="percentage">Percentage (-30%)</option>
               <option value="amount">Amount (-$20)</option>
               <option value="text">Custom Text</option>
-              <option value="other">Other</option>
             </select></div>
           </div>
           <div id="sale-custom-field" class="hidden mt-3 pl-2.5 border-l-2 border-gray-300">
@@ -1797,22 +1746,19 @@
           <div class="ctrl-row">
             <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="soldout-text-color" value="#ffffff"><input type="text" id="soldout-text-color-hex" value="#ffffff" readonly></div>
-            <label style="min-width:auto;margin-left:0.3rem;">BG</label>
+            <label style="min-width:auto;margin-left:0.3rem;">Background</label>
             <div class="color-picker-compact"><input type="color" id="soldout-bg-color" value="#374151"><input type="text" id="soldout-bg-color-hex" value="#374151" readonly></div>
           </div>
          
           <div class="grid grid-cols-3 gap-x-4 gap-y-1">
             <div class="slider-row mb-0"><label>Size</label><input type="range" id="soldout-font-size" min="9" max="18" value="11" class="flex-1"><span id="soldout-font-size-val" class="slider-val">11px</span></div>
             <div class="ctrl-row mb-0"><label>Weight</label><select id="soldout-weight" class="micro-select w-24">
-              <option value="300">Light</option>
               <option value="400" selected>Regular</option>
               <option value="700">Bold</option>
             </select></div>
             <div class="ctrl-row mb-0"><label>Position</label><select id="soldout-position" class="micro-select w-24">
               <option value="top-left">Top Left</option>
               <option value="top-right">Top Right</option>
-              <option value="bottom-left">Bottom Left</option>
-              <option value="bottom-right">Bottom Right</option>
             </select></div>
             <div class="ctrl-row mb-0 col-span-3"><label>Style</label><select id="soldout-style" class="micro-select w-40">
               <option value="soldout">Sold Out</option>
@@ -1845,21 +1791,18 @@
           <div class="ctrl-row">
             <label>Color</label>
             <div class="color-picker-compact"><input type="color" id="lowstock-text-color" value="#ffffff"><input type="text" id="lowstock-text-color-hex" value="#ffffff" readonly></div>
-            <label style="min-width:auto;margin-left:0.3rem;">BG</label>
+            <label style="min-width:auto;margin-left:0.3rem;">Background</label>
             <div class="color-picker-compact"><input type="color" id="lowstock-bg-color" value="#ea580c"><input type="text" id="lowstock-bg-color-hex" value="#ea580c" readonly></div>
           </div>
          
           <div class="grid grid-cols-2 gap-x-4 gap-y-1">
             <div class="ctrl-row mb-0"><label>Weight</label><select id="lowstock-weight" class="micro-select w-24">
-              <option value="300">Light</option>
               <option value="400" selected>Regular</option>
               <option value="700">Bold</option>
             </select></div>
             <div class="ctrl-row mb-0"><label>Position</label><select id="lowstock-position" class="micro-select w-24">
               <option value="top-left">Top Left</option>
               <option value="top-right">Top Right</option>
-              <option value="bottom-left">Bottom Left</option>
-              <option value="bottom-right">Bottom Right</option>
             </select></div>
           </div>
          
@@ -1947,7 +1890,7 @@
           </div>
 
           <div class="info-note-box">
-            <p>Need to add custom fields like metafields, product tags, or other unique data to your product cards? Our team can help you extend the card design with any additional information you need. Feel free to <span class="contact-link" onclick="openChatWithMessage('Hi, I need help with customize product card')">Contact us</span> and we'll guide you through the options!</p>
+            <p>Want to customize your Product Grid &amp; Card further or add custom fields to your products? <span class="contact-link" onclick="openChatWithMessage('Hi I want to customize Product Grid and Product Card')">Contact us</span> for help.</p>
           </div>
         </div>
       </div>
@@ -2089,10 +2032,12 @@ function selectLayout(el) {
 // ==================== FILTER PREVIEW ====================
 function updateFilterPreview() {
   const panel = document.getElementById('filter-preview-panel');
-  panel.style.backgroundColor = document.getElementById('filter-bar-bg').value;
+  const barBg = document.getElementById('filter-bar-bg').value;
+  panel.style.backgroundColor = barBg === '#ffffff' ? 'transparent' : barBg;
+
 
   const layout = document.getElementById('filter-layout')?.value || 'offcanvas-desktop';
-  const columns = document.getElementById('horizontal-columns')?.value || '3';
+  const columns = document.getElementById('horizontal-columns')?.value || '2';
   panel.classList.toggle('filter-preview-horizontal', layout === 'horizontal');
   panel.style.setProperty('--filter-value-columns', columns);
   const gapMap = { '2': '10px', '3': '10px', '4': '9px', '5': '8px', '6': '8px' };
@@ -2103,33 +2048,29 @@ function updateFilterPreview() {
   
   // Apply filter bar width — VERTICAL/OFFCANVAS only (horizontal is full width)
   const barWidthInput = document.getElementById('filter-bar-width');
-  const barWidth = barWidthInput.value;
+  const barWidth = parseInt(barWidthInput.value, 10);
   const previewCol = document.getElementById('filter-preview-col');
-  if (layout === 'horizontal') {
-    panel.style.width = '100%';
-    panel.style.minWidth = '';
-    panel.style.maxWidth = '';
-    if (previewCol) {
-      previewCol.style.width = '';
-      previewCol.style.flex = '1 1 0';
-      previewCol.style.minWidth = '320px';
-    }
-    barWidthInput.disabled = true;
-    barWidthInput.style.opacity = '0.4';
-  } else {
-    // Panel = barWidth, wrapper column = barWidth + config-box padding (32px) so panel fits without overflow
-    const colWidth = (parseInt(barWidth, 10) + 32);
-    panel.style.width = barWidth + 'px';
-    panel.style.minWidth = barWidth + 'px';
-    panel.style.maxWidth = barWidth + 'px';
-    if (previewCol) {
-      previewCol.style.flex = '0 0 ' + colWidth + 'px';
-      previewCol.style.width = colWidth + 'px';
-      previewCol.style.minWidth = '';
-    }
-    barWidthInput.disabled = false;
-    barWidthInput.style.opacity = '';
+  const previewCard = document.getElementById('filter-preview-card');
+  const previewNote = document.getElementById('filter-preview-note');
+  // Keep the preview column tightly sized to the bar width while letting the settings column absorb extra space.
+  const cardWidth = barWidth + 32;
+  panel.style.width = barWidth + 'px';
+  panel.style.minWidth = barWidth + 'px';
+  panel.style.maxWidth = barWidth + 'px';
+  if (previewCol) {
+    previewCol.style.width = cardWidth + 'px';
+    previewCol.style.flexBasis = cardWidth + 'px';
   }
+  if (previewCard) {
+    previewCard.style.width = '100%';
+    previewCard.style.maxWidth = '100%';
+  }
+  if (previewNote) {
+    previewNote.style.width = '100%';
+    previewNote.style.maxWidth = '100%';
+  }
+  barWidthInput.disabled = false;
+  barWidthInput.style.opacity = '';
 
   // Filter Option Label settings ALSO drive the "Filter By" header
   const optFontSize = document.getElementById('opt-font-size').value+'px';
@@ -2425,7 +2366,7 @@ function updateSKUPreview() {
   if (mode === 'full') {
     // SKU: CODE format
     const fontFamily = document.getElementById('sku-font-full').value;
-    const transform = document.getElementById('sku-transform-full').value;
+    const transform = 'none';
     
     const labelSize = document.getElementById('sku-label-size').value + 'px';
     const labelColor = document.getElementById('sku-label-color').value;
@@ -2466,7 +2407,7 @@ function updateSKUPreview() {
     const codeColor = document.getElementById('sku-code-only-color').value;
     const codeBg = document.getElementById('sku-code-only-bg').value;
     const codeWeight = document.getElementById('sku-code-only-weight').value;
-    const transform = document.getElementById('sku-transform-code-only').value;
+    const transform = 'none';
     
     skuContainer.innerHTML = `
       <span class="sku-preview-code" style="
@@ -3085,7 +3026,6 @@ function collectAllSettings() {
     skuCodeColor: getVal('sku-code-color'),
     skuCodeBg: getVal('sku-code-bg'),
     skuCodeWeight: getVal('sku-code-weight'),
-    skuTransformFull: getVal('sku-transform-full'),
     
     // SKU Code Only Mode
     skuFontCodeOnly: getVal('sku-font-code-only'),
@@ -3093,7 +3033,6 @@ function collectAllSettings() {
     skuCodeOnlyColor: getVal('sku-code-only-color'),
     skuCodeOnlyBg: getVal('sku-code-only-bg'),
     skuCodeOnlyWeight: getVal('sku-code-only-weight'),
-    skuTransformCodeOnly: getVal('sku-transform-code-only'),
 
     // ===== ELEMENT ORDER =====
     elementOrder: elementOrder
@@ -3185,9 +3124,9 @@ window.onload = () => {
   
   // SKU slider and select listeners for both modes
   ['sku-font-full','sku-label-size','sku-label-color','sku-label-bg','sku-label-weight',
-   'sku-code-size','sku-code-color','sku-code-bg','sku-code-weight','sku-transform-full',
+   'sku-code-size','sku-code-color','sku-code-bg','sku-code-weight',
    'sku-font-code-only','sku-code-only-size','sku-code-only-color','sku-code-only-bg',
-   'sku-code-only-weight','sku-transform-code-only'].forEach(id => {
+   'sku-code-only-weight'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener('input', () => {
