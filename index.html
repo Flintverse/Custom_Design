@@ -660,11 +660,9 @@
           <div id="horizontal-columns-row" class="ctrl-row hidden mt-3">
             <label>Horizontal Columns</label>
             <select id="horizontal-columns" class="micro-select w-24">
-              <option value="2" selected>2</option>
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
               <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
             </select>
           </div>
           <input type="hidden" id="filter-layout" value="offcanvas-desktop">
@@ -681,29 +679,72 @@
             </div>
           </div>
         </div>
+        <!-- ToolBar -->
+        <div class="config-box">
+          <h2 class="section-title mb-2">ToolBar</h2>
+          <div class="space-y-2">
+            <!-- Line 1: Preview -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[12px] text-gray-600 font-medium">Preview:</span>
+              <span id="toolbar-pill-1" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] border" style="background:#f3f4f6;border-color:#f3f4f6;color:#111827;">
+                Blue <span class="toolbar-pill-x cursor-pointer" style="color:#6b7280;">&times;</span>
+              </span>
+              <span id="toolbar-pill-2" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] border" style="background:#f3f4f6;border-color:#f3f4f6;color:#111827;">
+                Red <span class="toolbar-pill-x cursor-pointer" style="color:#6b7280;">&times;</span>
+              </span>
+              <span id="toolbar-clear-all" class="text-[12px] underline cursor-pointer" style="color:#111827;">Clear all</span>
+            </div>
+
+            <!-- Line 2: Color + Background + Close Icon -->
+            <div class="flex flex-wrap items-end gap-4">
+              <div class="ctrl-row mb-0">
+                <label>Color</label>
+                <div class="color-picker-compact">
+                  <input type="color" id="filter-bar-text-color" value="#111827">
+                  <input type="text" id="filter-bar-text-color-hex" value="#111827" readonly>
+                </div>
+              </div>
+              <div class="ctrl-row mb-0">
+                <label>Background</label>
+                <div class="color-picker-compact">
+                  <input type="color" id="filter-bar-active-bg" value="#f3f4f6">
+                  <input type="text" id="filter-bar-active-bg-hex" value="#f3f4f6" readonly>
+                </div>
+              </div>
+              <div class="ctrl-row mb-0">
+                <label>Close Icon</label>
+                <div class="color-picker-compact">
+                  <input type="color" id="filter-bar-close-color" value="#6b7280">
+                  <input type="text" id="filter-bar-close-color-hex" value="#6b7280" readonly>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- Filter Bar -->
         <div class="config-box">
           <h2 class="section-title mb-2">Filter Bar</h2>
-          <div class="space-y-1.5">
+          <div class="space-y-2">
+            <!-- Line 1: Sticky Filter -->
+            <label class="flex items-center gap-1.5 text-[13px] text-gray-700 cursor-pointer">
+              <input type="checkbox" id="sticky-filter" class="accent-blue-600 w-3.5 h-3.5"> Sticky Filter (scrolls with page)
+            </label>
+
+            <!-- Line 2: Bar Background + Bar Width -->
             <div class="flex flex-wrap items-end gap-4">
               <div class="ctrl-row mb-0">
-                <label>Background</label>
+                <label>Bar Background</label>
                 <div class="color-picker-compact">
                   <input type="color" id="filter-bar-bg" value="#ffffff">
                   <input type="text" id="filter-bar-bg-hex" value="#ffffff" readonly>
                 </div>
               </div>
-
               <div class="slider-row mb-0">
                 <label>Bar Width</label>
                 <input type="range" id="filter-bar-width" min="180" max="450" value="280" class="flex-1 max-w-[200px]">
                 <span id="filter-bar-width-val" class="slider-val">280px</span>
               </div>
             </div>
-
-            <label class="flex items-center gap-1.5 text-[13px] text-gray-700 cursor-pointer mt-0.5">
-              <input type="checkbox" id="sticky-filter" class="accent-blue-600 w-3.5 h-3.5"> Sticky Filter (scrolls with page)
-            </label>
           </div>
         </div>
         <!-- Filter Option Label -->
@@ -792,24 +833,17 @@
             </div>
           </div>
         </div>
-        <!-- Filter Button -->
-        <div class="config-box">
-          <h2 class="section-title mb-1">Filter Button</h2>
+        <!-- Apply Filters Button (only for Off-Canvas Desktop) -->
+        <div class="config-box" id="filter-button-config-box">
+          <h2 class="section-title mb-1">Apply Filters Button</h2>
 
           <div class="space-y-3">
+            <!-- Line 1: Font + Weight + Custom -->
             <div class="flex flex-nowrap items-end gap-3">
               <div class="font-select-wrap mb-0">
                 <label>Font</label>
                 <select id="btn-font" class="font-select w-36"></select>
               </div>
-              <div class="slider-row mb-0 flex-nowrap">
-                <label>Size</label>
-                <input type="range" id="btn-font-size" min="10" max="20" value="13" class="flex-1 max-w-[140px]">
-                <span id="btn-font-val" class="slider-val">13px</span>
-              </div>
-            </div>
-
-            <div class="flex flex-nowrap items-end gap-3">
               <div class="ctrl-row mb-0 flex-nowrap tight-label">
                 <label>Weight</label>
                 <select id="btn-weight" class="micro-select w-28">
@@ -817,13 +851,13 @@
                   <option value="700">Bold</option>
                 </select>
               </div>
-              <div class="ctrl-row mb-0 flex-nowrap tight-label">
-                <label>Radius</label>
-                <input type="range" id="btn-radius" min="0" max="50" value="8" class="flex-1 max-w-[120px]">
-                <span id="btn-radius-val" class="slider-val">8px</span>
+              <div class="ctrl-row mb-0 flex-nowrap tight-label" style="flex:1;">
+                <label>Custom</label>
+                <input type="text" id="btn-custom-text" placeholder="Apply Filters" class="micro-select" style="width:140px;">
               </div>
             </div>
 
+            <!-- Line 2: Color + Background + Transform -->
             <div class="flex flex-nowrap items-end gap-3">
               <div class="ctrl-row mb-0 flex-nowrap tight-label">
                 <label>Color</label>
@@ -849,14 +883,17 @@
               </div>
             </div>
 
-            <div class="border-t border-gray-200 pt-2 mt-2">
-              <div class="flex flex-nowrap items-center gap-6">
-                <label class="flex items-center gap-1.5 text-[12px] text-gray-600 cursor-pointer">
-                  <input type="radio" name="filterBehavior" value="auto" class="accent-blue-600 w-3 h-3"> Auto-filter (real-time)
-                </label>
-                <label class="flex items-center gap-1.5 text-[12px] text-gray-600 cursor-pointer">
-                  <input type="radio" name="filterBehavior" value="manual" checked class="accent-blue-600 w-3 h-3"> Manual filter (click apply)
-                </label>
+            <!-- Line 3: Size + Radius -->
+            <div class="flex flex-nowrap items-end gap-3">
+              <div class="slider-row mb-0 flex-nowrap">
+                <label>Size</label>
+                <input type="range" id="btn-font-size" min="10" max="20" value="13" class="flex-1 max-w-[140px]">
+                <span id="btn-font-val" class="slider-val">13px</span>
+              </div>
+              <div class="ctrl-row mb-0 flex-nowrap tight-label">
+                <label>Radius</label>
+                <input type="range" id="btn-radius" min="0" max="50" value="8" class="flex-1 max-w-[120px]">
+                <span id="btn-radius-val" class="slider-val">8px</span>
               </div>
             </div>
           </div>
@@ -1140,8 +1177,8 @@
           <h2 class="section-title mb-2">Product Grid (Desktop)</h2>
           <!-- Row 1: Products/Page + Items/Row -->
           <div class="grid grid-cols-2 gap-x-5 gap-y-1.5 mb-3">
-            <div class="slider-row"><label class="min-w-[110px]">Products/Page</label><input type="range" id="products-per-page" min="1" max="36" value="24" class="flex-1"><span id="perpage-val" class="slider-val">24</span></div>
-            <div class="ctrl-row"><label class="min-w-[110px]">Items/Row</label><select id="items-row" class="micro-select w-24"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option></select></div>
+            <div class="slider-row"><label class="min-w-[110px]">Products per Page</label><input type="range" id="products-per-page" min="1" max="36" value="24" class="flex-1"><span id="perpage-val" class="slider-val">24</span></div>
+            <div class="ctrl-row"><label class="min-w-[110px]">Items per Rows</label><select id="items-row" class="micro-select w-24"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option></select></div>
           </div>
           <!-- Row 2: Background Color + Pagination -->
           <div class="grid grid-cols-2 gap-x-5 gap-y-1.5">
@@ -1274,7 +1311,6 @@
             <div class="h-cell"><label>Image Shape</label>
               <select id="image-shape" class="micro-select" style="width:140px;">
                 <option value="default">Default</option>
-                <option value="rounded">Rounded</option>
               </select>
             </div>
           </div>
@@ -1522,11 +1558,6 @@
             <div class="h-cell">
               <label class="flex items-center gap-1.5 text-[12px] text-gray-700 cursor-pointer" style="font-weight:500;">
                 <input type="checkbox" id="hide-decimal" class="accent-blue-600 w-3.5 h-3.5"> Hide Decimal (.00)
-              </label>
-            </div>
-            <div class="h-cell">
-              <label class="flex items-center gap-1.5 text-[12px] text-gray-700 cursor-pointer" style="font-weight:500;">
-                <input type="checkbox" id="round-up" class="accent-blue-600 w-3.5 h-3.5"> Round Up
               </label>
             </div>
           </div>
@@ -2117,6 +2148,10 @@ function selectLayout(el) {
   const columnsRow = document.getElementById('horizontal-columns-row');
   if (columnsRow) columnsRow.classList.toggle('hidden', layout !== 'horizontal');
 
+  // Apply Filters Button config only visible for off-canvas (desktop)
+  const btnBox = document.getElementById('filter-button-config-box');
+  if (btnBox) btnBox.classList.toggle('hidden', layout !== 'offcanvas-desktop');
+
   updateFilterPreview();
   debouncedAutoSave();
 }
@@ -2218,7 +2253,8 @@ function updateFilterPreview() {
     el.style.textTransform = '';
   });
   const btn = document.getElementById('preview-btn');
-  btn.textContent = 'Apply Filters';
+  const customText = (document.getElementById('btn-custom-text')?.value || '').trim();
+  btn.textContent = customText || 'Apply Filters';
   btn.style.fontSize = document.getElementById('btn-font-size').value+'px';
   btn.style.borderRadius = document.getElementById('btn-radius').value+'px';
   btn.style.textTransform = document.getElementById('btn-transform').value;
@@ -2228,15 +2264,29 @@ function updateFilterPreview() {
   btn.style.fontWeight = document.getElementById('btn-weight').value;
   syncHex('opt-color'); syncHex('val-color'); syncHex('btn-text-color');
   syncHex('btn-bg-color'); syncHex('filter-bar-bg');
-  const behavior = document.querySelector('input[name="filterBehavior"]:checked').value;
-  const applyBtn = document.getElementById('preview-btn');
-  if (behavior === 'auto') {
-    applyBtn.style.display = 'none';
-    document.getElementById('filter-status').textContent = 'Auto-updating...';
-  } else {
-    applyBtn.style.display = 'block';
-    document.getElementById('filter-status').textContent = 'Click to apply filters';
-  }
+  syncHex('filter-bar-text-color'); syncHex('filter-bar-close-color'); syncHex('filter-bar-active-bg');
+  // Update ToolBar preview pills
+  const tbText = document.getElementById('filter-bar-text-color').value;
+  const tbBg = document.getElementById('filter-bar-active-bg').value;
+  const tbClose = document.getElementById('filter-bar-close-color').value;
+  ['toolbar-pill-1','toolbar-pill-2'].forEach(id => {
+    const pill = document.getElementById(id);
+    if (pill) {
+      pill.style.backgroundColor = tbBg;
+      pill.style.borderColor = tbBg;
+      pill.style.color = tbText;
+      const x = pill.querySelector('.toolbar-pill-x');
+      if (x) x.style.color = tbClose;
+    }
+  });
+  const clearEl = document.getElementById('toolbar-clear-all');
+  if (clearEl) clearEl.style.color = tbText;
+  // Apply Filter button only visible in preview when off-canvas (desktop)
+  const layoutVal = document.getElementById('filter-layout')?.value || 'offcanvas-desktop';
+  const footer = document.getElementById('filter-preview-footer');
+  if (footer) footer.style.display = layoutVal === 'offcanvas-desktop' ? '' : 'none';
+  const statusEl = document.getElementById('filter-status');
+  if (statusEl) statusEl.textContent = '';
 }
 
 function sortPreviewFilterValues() {
@@ -2643,7 +2693,6 @@ function applyElementOrder() {
 // ==================== PRODUCT PREVIEW ====================
 function formatPrice(basePrice) {
   let price = parseFloat(basePrice);
-  if(document.getElementById('round-up').checked) price = Math.ceil(price);
   if(document.getElementById('hide-decimal').checked) price = Math.round(price);
   return '$' + price.toFixed(document.getElementById('hide-decimal').checked ? 0 : 2);
 }
@@ -2976,7 +3025,6 @@ function collectAllSettings() {
     // ===== PRICES =====
     hidePrice: getVal('hide-price'),
     hideDecimal: getVal('hide-decimal'),
-    roundUp: getVal('round-up'),
     
     showFixedPrice: getVal('show-fixed-price'),
     fixedPriceFont: getVal('fixed-price-font-family'),
@@ -3103,7 +3151,10 @@ function collectAllSettings() {
     btnRadius: getVal('btn-radius'),
     
     // ===== FILTER BEHAVIOR =====
-    filterBehavior: document.querySelector('input[name="filterBehavior"]:checked')?.value || 'manual',
+    applyBtnText: getVal('btn-custom-text'),
+    filterBarTextColor: getVal('filter-bar-text-color'),
+    filterBarCloseColor: getVal('filter-bar-close-color'),
+    filterBarActiveBg: getVal('filter-bar-active-bg'),
 
     // ===== SKU SETTINGS =====
     showSku: getVal('show-sku'),
