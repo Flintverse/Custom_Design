@@ -572,6 +572,7 @@
       flex: 0 0 33.333%;
       max-height: calc(100vh - 180px);
       overflow-y: auto;
+      overflow-x:auto;
       padding-right: 0.5rem;
       scrollbar-width: thin;
       scrollbar-color: #d1d5db transparent;
@@ -591,7 +592,7 @@
     }
     
     .grid-right-panel {
-      flex: 0 0 33.333%;
+      flex: 0 0 25%;
       position: relative;
     }
     
@@ -608,15 +609,11 @@
     <div class="flex justify-between items-start gap-4">
       <div class="flex flex-col gap-1">
         <h1 class="text-lg font-bold text-gray-900 tracking-tight">Filter & Product Grid Design</h1>
-        <div class="text-xs text-gray-700" style="white-space: nowrap;">
-          Custom Design guideline 
-          <a href="https://flintverse.gitbook.io/docs/findter-custom-filter-search/user-guide/filter-and-product-grid-design/set-filter-layouts"
-            target="_blank" 
-            rel="noopener"
-            class="font-bold underline hover:text-blue-600">
-            here
-          </a>
-        </div>
+        <a href="https://flintverse.gitbook.io/docs/findter-custom-filter-search/user-guide/filter-and-product-grid-design/set-filter-layouts"
+           target="_blank" rel="noopener"
+           class="text-xs font-bold underline text-gray-700 hover:text-blue-600 w-fit">
+          Custom Design guideline here
+        </a>
       </div>
       <div class="flex items-center gap-2">
         <button id="edit-mode-btn" onclick="toggleEditMode()" title="Toggle edit mode"
@@ -3417,6 +3414,11 @@ document.addEventListener('click', (e) => {
     }
   }
 
+  function getResizables(){
+    return Array.from(document.querySelectorAll('#grid-tab .grid-left-panel .config-box, #filter-settings-col .config-box'))
+      .filter(el => !el.matches('#filter-preview-card, #grid-preview-card'));
+  }
+
   function collectCurrentLayout(){
     const data = {};
     getDraggables().forEach(el => {
@@ -3424,6 +3426,14 @@ document.addEventListener('click', (e) => {
       const dx = parseFloat(el.dataset.editDx) || 0;
       const dy = parseFloat(el.dataset.editDy) || 0;
       if (dx || dy) data[el.dataset.editId] = { dx, dy };
+    });
+    getResizables().forEach(el => {
+      if (!el.dataset.editId) el.dataset.editId = makeStableId(el);
+      const w = el.style.width, h = el.style.height;
+      if (w || h) {
+        const id = 'sz:' + el.dataset.editId;
+        data[id] = { w: w || '', h: h || '' };
+      }
     });
     return data;
   }
@@ -3437,6 +3447,18 @@ document.addEventListener('click', (e) => {
         applyOffset(el, saved.dx || 0, saved.dy || 0);
       } else if (options.clearMissing) {
         applyOffset(el, 0, 0);
+      }
+    });
+    getResizables().forEach(el => {
+      if (!el.dataset.editId) el.dataset.editId = makeStableId(el);
+      const id = 'sz:' + el.dataset.editId;
+      const saved = data[id];
+      if (saved && (saved.w || saved.h)) {
+        if (saved.w) el.style.width = saved.w;
+        if (saved.h) el.style.height = saved.h;
+      } else if (options.clearMissing) {
+        el.style.width = '';
+        el.style.height = '';
       }
     });
   }
@@ -3553,6 +3575,83 @@ document.addEventListener('click', (e) => {
     el.style.top = cssOffset(el.dataset._baseTop, dy);
   }
 
+  function addResizeHandles(box){
+    if (box.dataset._resizeReady) return;
+    box.dataset._resizeReady = '1';
+    if (getComputedStyle(box).position === 'static') box.style.position = 'relative';
+    ['e','s','se','w','n','nw','ne','sw'].forEach(dir => {
+      const h = document.createElement('div');
+      h.className = 'edit-resize-handle edit-resize-' + dir;
+      h.dataset.dir = dir;
+      h.addEventListener('pointerdown', (e) => onResizeDown(e, box, dir));
+      box.appendChild(h);
+    });
+  }
+  function removeResizeHandles(box){
+    box.querySelectorAll(':scope > .edit-resize-handle').forEach(h => h.remove());
+    delete box.dataset._resizeReady;
+  }
+
+  let resizeState = null;
+  function onResizeDown(e, box, dir){
+  if (!editMode || e.button !== 0) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const rect = box.getBoundingClientRect();
+  // Capture current left/top from inline styles (default 0)
+  const currentLeft = parseFloat(box.style.left) || 0;
+  const currentTop = parseFloat(box.style.top) || 0;
+  resizeState = {
+    box, dir,
+    startX: e.clientX, startY: e.clientY,
+    startW: rect.width, startH: rect.height,
+    startLeft: currentLeft,
+    startTop: currentTop
+  };
+  document.addEventListener('pointermove', onResizeMove);
+  document.addEventListener('pointerup', onResizeUp);
+  }
+  function onResizeMove(e){
+  if (!resizeState) return;
+  const { box, dir, startX, startY, startW, startH, startLeft, startTop } = resizeState;
+  const dx = e.clientX - startX, dy = e.clientY - startY;
+  let w = startW, h = startH;
+  let newLeft = startLeft, newTop = startTop;
+
+  // Width changes
+  if (dir.includes('e')) {
+    w = Math.max(120, startW + dx);
+  }
+  if (dir.includes('w')) {
+    w = Math.max(120, startW - dx);
+    // Adjust left so the right edge stays fixed
+    newLeft = startLeft + (startW - w);
+  }
+
+  // Height changes
+  if (dir.includes('s')) {
+    h = Math.max(60, startH + dy);
+  }
+  if (dir.includes('n')) {
+    h = Math.max(60, startH - dy);
+    // Adjust top so the bottom edge stays fixed
+    newTop = startTop + (startH - h);
+  }
+
+  // Apply new dimensions and position
+  box.style.width = w + 'px';
+  box.style.height = h + 'px';
+  // Only update left/top if they changed (prevents unnecessary writes)
+  if (newLeft !== startLeft) box.style.left = newLeft + 'px';
+  if (newTop !== startTop) box.style.top = newTop + 'px';
+  }
+
+  function onResizeUp(){
+    resizeState = null;
+    document.removeEventListener('pointermove', onResizeMove);
+    document.removeEventListener('pointerup', onResizeUp);
+  }
+
   function enableEdit(){
     document.body.classList.add('edit-mode-on');
     expandAllCollapsed();
@@ -3566,6 +3665,10 @@ document.addEventListener('click', (e) => {
       applyOffset(el, dx, dy);
       el.addEventListener('pointerdown', onDown);
     });
+    getResizables().forEach(box => {
+      box.classList.add('edit-resizable');
+      addResizeHandles(box);
+    });
     document.addEventListener('click', blockEditClick, true);
   }
 
@@ -3576,6 +3679,10 @@ document.addEventListener('click', (e) => {
     document.querySelectorAll('.edit-draggable').forEach(el => {
       el.classList.remove('edit-draggable','edit-dragging');
       el.removeEventListener('pointerdown', onDown);
+    });
+    document.querySelectorAll('.edit-resizable').forEach(box => {
+      box.classList.remove('edit-resizable');
+      removeResizeHandles(box);
     });
     document.removeEventListener('click', blockEditClick, true);
     clearAutoExpandedFlags();
@@ -3695,6 +3802,28 @@ document.addEventListener('click', (e) => {
   body.edit-mode-on .config-box.collapsed .collapse-body { display: block !important; }
   body.edit-mode-on .config-box.collapsed { /* visually expand */ }
   body.edit-mode-on .config-box.collapsed .collapse-chev { transform: rotate(0deg) !important; }
+
+  /* Resizable config boxes in edit mode */
+  body.edit-mode-on .edit-resizable {
+    outline: 1px dashed #10b981;
+    outline-offset: 2px;
+    overflow: auto;
+  }
+  .edit-resize-handle {
+    position: absolute;
+    background: transparent;
+    z-index: 90;
+    touch-action: none;
+  }
+  .edit-resize-handle:hover { background: rgba(16,185,129,0.25); }
+  .edit-resize-e { top: 0; right: -4px; width: 8px; height: 100%; cursor: ew-resize; }
+  .edit-resize-w { top: 0; left: -4px; width: 8px; height: 100%; cursor: ew-resize; }
+  .edit-resize-s { bottom: -4px; left: 0; height: 8px; width: 100%; cursor: ns-resize; }
+  .edit-resize-n { top: -4px; left: 0; height: 8px; width: 100%; cursor: ns-resize; }
+  .edit-resize-se { right: -6px; bottom: -6px; width: 14px; height: 14px; cursor: nwse-resize; background: #10b981; border-radius: 2px; }
+  .edit-resize-sw { left: -6px; bottom: -6px; width: 14px; height: 14px; cursor: nesw-resize; background: #10b981; border-radius: 2px; }
+  .edit-resize-ne { right: -6px; top: -6px; width: 14px; height: 14px; cursor: nesw-resize; background: #10b981; border-radius: 2px; }
+  .edit-resize-nw { left: -6px; top: -6px; width: 14px; height: 14px; cursor: nwse-resize; background: #10b981; border-radius: 2px; }
 </style>
 </body>
 </html>
