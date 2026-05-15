@@ -608,11 +608,15 @@
     <div class="flex justify-between items-start gap-4">
       <div class="flex flex-col gap-1">
         <h1 class="text-lg font-bold text-gray-900 tracking-tight">Filter & Product Grid Design</h1>
-        <a href="https://flintverse.gitbook.io/docs/findter-custom-filter-search/user-guide/filter-and-product-grid-design/set-filter-layouts"
-           target="_blank" rel="noopener"
-           class="text-xs font-bold underline text-gray-700 hover:text-blue-600 w-fit">
-          Custom Design guideline here
-        </a>
+        <div class="text-xs text-gray-700" style="white-space: nowrap;">
+          Custom Design guideline 
+          <a href="https://flintverse.gitbook.io/docs/findter-custom-filter-search/user-guide/filter-and-product-grid-design/set-filter-layouts"
+            target="_blank" 
+            rel="noopener"
+            class="font-bold underline hover:text-blue-600">
+            here
+          </a>
+        </div>
       </div>
       <div class="flex items-center gap-2">
         <button id="edit-mode-btn" onclick="toggleEditMode()" title="Toggle edit mode"
@@ -633,7 +637,7 @@
   <!-- ==================== FILTER DESIGN TAB ==================== -->
   <div id="filter-tab" class="tab-content">
     <div class="flex gap-5 p-5 bg-gray-50/50 items-start justify-center">
-      <div id="filter-settings-col" class="space-y-4" style="flex: 0 1 650px; min-width: 0;">
+      <div id="filter-settings-col" class="space-y-4" style="flex: 0 1 600px; min-width: 0;">
         <!-- Filter Layout -->
         <div class="config-box">
           <h2 class="section-title mb-1">Filter Layout</h2>
@@ -1345,80 +1349,78 @@
               <label>Font</label>
               <select id="sku-font-full" class="font-select"></select>
             </div>
-            
-            <div class="space-y-3">
+
+            <div class="grid grid-cols-2 gap-x-4 divide-x divide-gray-200">
               <!-- SKU Label Options -->
-              <div class="space-y-1.5 pb-3 border-b border-gray-200">
+              <div class="space-y-1.5 pr-3">
                 <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">SKU Label</p>
-                
-                <div class="slider-row mb-0">
-                  <label class="min-w-[60px]">Size</label>
-                  <input type="range" id="sku-label-size" min="9" max="18" value="11" class="flex-1">
-                  <span id="sku-label-size-val" class="slider-val">11px</span>
+
+                <div class="flex items-center gap-2 mb-0">
+                  <label class="min-w-[60px] text-[12px] text-gray-700 shrink-0">Size</label>
+                  <input type="range" id="sku-label-size" min="9" max="18" value="11" class="flex-1 min-w-0">
+                  <span id="sku-label-size-val" class="slider-val shrink-0">11px</span>
                 </div>
-                
-                <div class="ctrl-row mb-0">
-                  <label class="min-w-[60px]">Color</label>
-                  <div class="color-picker-compact">
+
+                <div class="flex items-center gap-2 mb-0">
+                  <label class="min-w-[60px] text-[12px] text-gray-700 shrink-0">Color</label>
+                  <div class="color-picker-compact flex-1 min-w-0">
                     <input type="color" id="sku-label-color" value="#6b7280">
-                    <input type="text" id="sku-label-color-hex" value="#6b7280" readonly>
+                    <input type="text" id="sku-label-color-hex" value="#6b7280" readonly class="min-w-0 w-full">
                   </div>
                 </div>
-                
-                <div class="ctrl-row mb-0">
-                  <label class="min-w-[60px]">Background</label>
-                  <div class="color-picker-compact">
+
+                <div class="flex items-center gap-2 mb-0">
+                  <label class="min-w-[60px] text-[12px] text-gray-700 shrink-0">Background</label>
+                  <div class="color-picker-compact flex-1 min-w-0">
                     <input type="color" id="sku-label-bg" value="#f3f4f6">
-                    <input type="text" id="sku-label-bg-hex" value="#f3f4f6" readonly>
+                    <input type="text" id="sku-label-bg-hex" value="#f3f4f6" readonly class="min-w-0 w-full">
                   </div>
                 </div>
-                
-                <div class="ctrl-row mb-0">
-                  <label class="min-w-[60px]">Weight</label>
-                  <select id="sku-label-weight" class="micro-select w-full">
-                          <option value="400" selected>Regular</option>
+
+                <div class="flex items-center gap-2 mb-0">
+                  <label class="min-w-[60px] text-[12px] text-gray-700 shrink-0">Weight</label>
+                  <select id="sku-label-weight" class="micro-select flex-1 min-w-0">
+                    <option value="400" selected>Regular</option>
                     <option value="700">Bold</option>
                   </select>
                 </div>
               </div>
-              
+
               <!-- Code Value Options -->
-              <div class="space-y-1.5">
+              <div class="space-y-1.5 pl-3">
                 <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Code Value</p>
-                
-                <div class="slider-row mb-0">
-                  <label class="min-w-[60px]">Size</label>
-                  <input type="range" id="sku-code-size" min="9" max="18" value="12" class="flex-1">
-                  <span id="sku-code-size-val" class="slider-val">12px</span>
+
+                <div class="flex items-center gap-2 mb-0">
+                  <label class="min-w-[60px] text-[12px] text-gray-700 shrink-0">Size</label>
+                  <input type="range" id="sku-code-size" min="9" max="18" value="12" class="flex-1 min-w-0">
+                  <span id="sku-code-size-val" class="slider-val shrink-0">12px</span>
                 </div>
-                
-                <div class="ctrl-row mb-0">
-                  <label class="min-w-[60px]">Color</label>
-                  <div class="color-picker-compact">
+
+                <div class="flex items-center gap-2 mb-0">
+                  <label class="min-w-[60px] text-[12px] text-gray-700 shrink-0">Color</label>
+                  <div class="color-picker-compact flex-1 min-w-0">
                     <input type="color" id="sku-code-color" value="#111827">
-                    <input type="text" id="sku-code-color-hex" value="#111827" readonly>
+                    <input type="text" id="sku-code-color-hex" value="#111827" readonly class="min-w-0 w-full">
                   </div>
                 </div>
-                
-                <div class="ctrl-row mb-0">
-                  <label class="min-w-[60px]">Background</label>
-                  <div class="color-picker-compact">
+
+                <div class="flex items-center gap-2 mb-0">
+                  <label class="min-w-[60px] text-[12px] text-gray-700 shrink-0">Background</label>
+                  <div class="color-picker-compact flex-1 min-w-0">
                     <input type="color" id="sku-code-bg" value="#ffffff">
-                    <input type="text" id="sku-code-bg-hex" value="#ffffff" readonly>
+                    <input type="text" id="sku-code-bg-hex" value="#ffffff" readonly class="min-w-0 w-full">
                   </div>
                 </div>
-                
-                <div class="ctrl-row mb-0">
-                  <label class="min-w-[60px]">Weight</label>
-                  <select id="sku-code-weight" class="micro-select w-full">
-                          <option value="400" selected>Regular</option>
+
+                <div class="flex items-center gap-2 mb-0">
+                  <label class="min-w-[60px] text-[12px] text-gray-700 shrink-0">Weight</label>
+                  <select id="sku-code-weight" class="micro-select flex-1 min-w-0">
+                    <option value="400" selected>Regular</option>
                     <option value="700">Bold</option>
                   </select>
                 </div>
               </div>
             </div>
-            
-            
           </div>
           
           <!-- MODE: CODE ONLY -->
@@ -1504,7 +1506,10 @@
         </div>
         <!-- PRICE SETTINGS -->
         <div class="config-box">
-          <h2 class="section-title mb-2">Price Settings</h2>
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="section-title">Price Settings</h2>
+            <label class="toggle-switch"><input type="checkbox" id="show-price" checked><span class="toggle-slider"></span></label>
+          </div>
           <div class="h-row">
             <div class="h-cell"><label>Hide Price When</label>
               <select id="hide-price" class="micro-select" style="width:160px;">
@@ -1529,7 +1534,7 @@
             <div class="price-subsection">
               <div class="price-subheader">
                 <span>Fixed / Regular Price</span>
-                <label class="toggle-switch" style="transform:scale(0.9)"><input type="checkbox" id="show-fixed-price" checked><span class="toggle-slider"></span></label>
+                <input type="checkbox" id="show-fixed-price" checked class="hidden">
               </div>
               <div class="h-row">
                 <div class="h-cell"><label>Font</label>
@@ -1556,7 +1561,7 @@
             <div class="price-subsection">
               <div class="price-subheader">
                 <span>Old / Compare-at Price</span>
-                <label class="toggle-switch" style="transform:scale(0.9)"><input type="checkbox" id="show-old-price" checked><span class="toggle-slider"></span></label>
+                <input type="checkbox" id="show-old-price" checked class="hidden">
               </div>
               <div class="h-row">
                 <div class="h-cell"><label>Font</label>
@@ -1583,7 +1588,7 @@
             <div class="price-subsection">
               <div class="price-subheader">
                 <span>Sale Price</span>
-                <label class="toggle-switch" style="transform:scale(0.9)"><input type="checkbox" id="show-sale-price" checked><span class="toggle-slider"></span></label>
+                <input type="checkbox" id="show-sale-price" checked class="hidden">
               </div>
               <div class="h-row">
                 <div class="h-cell"><label>Font</label>
@@ -1607,7 +1612,7 @@
               </div>
             </div>
           </div>
-         
+
           <p id="price-warning" class="text-[11px] text-amber-600 mt-1.5 hidden flex items-center gap-1"><i class="fas fa-exclamation-triangle text-[10px]"></i> Old price requires sale price enabled</p>
         </div>
         <!-- Add to Cart Button -->
@@ -2703,7 +2708,8 @@ function updateProductPreview() {
   
   // Prices
   const hideOpt = document.getElementById('hide-price').value;
-  let hidePrices = hideOpt !== 'none';
+  const showPriceMaster = document.getElementById('show-price')?.checked !== false;
+  let hidePrices = hideOpt !== 'none' || !showPriceMaster;
   const priceSection = document.getElementById('container-price');
   priceSection.classList.toggle('hidden', hidePrices);
  
