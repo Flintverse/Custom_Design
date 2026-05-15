@@ -1631,6 +1631,14 @@
     // Sticky filter
     stickyFilter: false,
 
+    // Filter bar token colors (Clear All + active filter pills)
+    filterBarTextColor: '#111827',
+    filterBarCloseColor: '#6b7280',
+    filterBarActiveBg: '#f3f4f6',
+
+    // Apply button custom text
+    applyBtnText: 'Apply Filters',
+
     // SKU defaults
     showSku: true,
     skuDisplayMode: 'full',
@@ -1813,6 +1821,17 @@
         panel.style.borderRadius = '';
       }
     }
+    // Apply bar background to the horizontal wrapper so it actually shows in horizontal layout
+    const horizWrap = document.getElementById('filter-horizontal-wrapper');
+    if (horizWrap) {
+      if (isHorizontal && c.filterBarBg) {
+        horizWrap.style.backgroundColor = c.filterBarBg;
+        horizWrap.style.borderRadius = '10px';
+      } else {
+        horizWrap.style.backgroundColor = '';
+        horizWrap.style.borderRadius = '';
+      }
+    }
 
     if (c.filterBarWidth && !isHorizontal) {
       const widthValue = c.filterBarWidth + 'px';
@@ -1861,16 +1880,30 @@
     // Filter title ("Filter by:") fully syncs with Filter Option Label settings
     applyLabel(document.getElementById('filter-title'));
     
-    // Apply button
-    const applyBtn = document.getElementById('filter-apply-btn');
-    if (applyBtn) {
-      if (c.btnFont) applyBtn.style.fontFamily = c.btnFont;
-      if (c.btnFontSize) applyBtn.style.fontSize = c.btnFontSize + 'px';
-      if (c.btnTextColor) applyBtn.style.color = c.btnTextColor;
-      if (c.btnBgColor) applyBtn.style.backgroundColor = c.btnBgColor;
-      if (c.btnWeight) applyBtn.style.fontWeight = c.btnWeight;
-      if (c.btnTransform) applyBtn.style.textTransform = c.btnTransform;
-      if (c.btnRadius) applyBtn.style.borderRadius = c.btnRadius + 'px';
+    // Apply Filters button — only visible for off-canvas (desktop)
+    const isOffcanvas = (c.filterLayout || 'offcanvas-desktop') === 'offcanvas-desktop';
+    let applyBtn = document.getElementById('filter-apply-btn');
+    if (isOffcanvas) {
+      if (!applyBtn && panel) {
+        applyBtn = document.createElement('button');
+        applyBtn.id = 'filter-apply-btn';
+        applyBtn.type = 'button';
+        applyBtn.className = 'w-full py-2 mt-4 text-sm font-semibold rounded-lg transition-all';
+        panel.appendChild(applyBtn);
+      }
+      if (applyBtn) {
+        applyBtn.style.display = '';
+        applyBtn.textContent = (c.applyBtnText && String(c.applyBtnText).trim()) || 'Apply Filters';
+        if (c.btnFont) applyBtn.style.fontFamily = c.btnFont;
+        if (c.btnFontSize) applyBtn.style.fontSize = c.btnFontSize + 'px';
+        if (c.btnTextColor) applyBtn.style.color = c.btnTextColor;
+        if (c.btnBgColor) applyBtn.style.backgroundColor = c.btnBgColor;
+        if (c.btnWeight) applyBtn.style.fontWeight = c.btnWeight;
+        if (c.btnTransform) applyBtn.style.textTransform = c.btnTransform;
+        if (c.btnRadius) applyBtn.style.borderRadius = c.btnRadius + 'px';
+      }
+    } else if (applyBtn) {
+      applyBtn.style.display = 'none';
     }
   }
 
@@ -2043,13 +2076,44 @@
       if (c.valTransform) el.style.textTransform = c.valTransform;
     };
 
-    resetStatic(document.getElementById('clear-all-btn'));
+    // Filter Bar text/close/background — applies to Clear All button + active filter tags
+    const barText = c.filterBarTextColor || '';
+    const barClose = c.filterBarCloseColor || '';
+    const barActiveBg = c.filterBarActiveBg || '';
+
+    const clearBtn = document.getElementById('clear-all-btn');
+    if (clearBtn) {
+      resetStatic(clearBtn);
+      if (barText) clearBtn.style.color = barText;
+      if (barActiveBg) clearBtn.style.backgroundColor = barActiveBg;
+    }
     resetStatic(document.getElementById('sort-label'));
     resetStatic(document.getElementById('sort-select'));
     resetStatic(document.getElementById('product-count'));
     document.querySelectorAll('#sort-select option').forEach(resetStatic);
-    document.querySelectorAll('.active-filter-tag').forEach(applyVal);
-    document.querySelectorAll('.active-filter-tag .filter-value, .active-filter-tag span').forEach(applyVal);
+
+    // Active filter tags (selected value pills) — use Filter Bar tokens, NOT Filter Value tokens
+    document.querySelectorAll('.active-filter-tag').forEach(tag => {
+      tag.style.fontFamily = '';
+      tag.style.fontSize = '';
+      tag.style.fontWeight = '';
+      tag.style.textTransform = '';
+      if (barText) tag.style.color = barText;
+      if (barActiveBg) {
+        tag.style.backgroundColor = barActiveBg;
+        tag.style.borderColor = barActiveBg;
+      }
+      tag.querySelectorAll('span').forEach(s => {
+        s.style.fontFamily = '';
+        s.style.fontSize = '';
+        s.style.fontWeight = '';
+        s.style.textTransform = '';
+        if (barText) s.style.color = barText;
+      });
+      tag.querySelectorAll('button').forEach(b => {
+        if (barClose) b.style.color = barClose;
+      });
+    });
   }
 
   /**
@@ -2682,11 +2746,17 @@
 
   function styleActiveTag(tag) {
     const c = window.__lastConfig || {};
-    if (c.valFont) tag.style.fontFamily = c.valFont;
-    if (c.valSize) tag.style.fontSize = c.valSize + 'px';
-    if (c.valColor) tag.style.color = c.valColor;
-    if (c.valWeight) tag.style.fontWeight = c.valWeight;
-    if (c.valTransform) tag.style.textTransform = c.valTransform;
+    if (c.filterBarTextColor) tag.style.color = c.filterBarTextColor;
+    if (c.filterBarActiveBg) {
+      tag.style.backgroundColor = c.filterBarActiveBg;
+      tag.style.borderColor = c.filterBarActiveBg;
+    }
+    tag.querySelectorAll('span').forEach(s => {
+      if (c.filterBarTextColor) s.style.color = c.filterBarTextColor;
+    });
+    tag.querySelectorAll('button').forEach(b => {
+      if (c.filterBarCloseColor) b.style.color = c.filterBarCloseColor;
+    });
   }
 
   function addActiveFilterTag(key, label, sourceEl) {
