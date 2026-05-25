@@ -17,6 +17,13 @@
     .filter-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
     .filter-scroll::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
     .filter-scroll::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+
+    /* Thinner scrollbar for filter value lists */
+    .filter-values-list { scrollbar-width: thin; scrollbar-color: #c1c1c1 #f1f1f1; }
+    .filter-values-list::-webkit-scrollbar { width: 4px; height: 4px; }
+    .filter-values-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
+    .filter-values-list::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+    .filter-values-list::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
     
     /* Price range slider */
     .range-slider {
@@ -256,7 +263,7 @@
     }
     .lov-search input {
       width: 100% !important;
-      border: 1px solid var(--lov-search-color, #e5e7eb) !important;
+      border: 1px solid var(--lov-search-border, #111827) !important;
       border-radius: 6px !important;
       padding: 8px 10px 8px 32px !important;
       font-size: 13px !important;
@@ -285,6 +292,16 @@
     #filter-panel.filter-horizontal .filter-section.open .filter-values-list .filter-value-search-inline {
       display: block;
       margin-bottom: 8px;
+      grid-column: 1 / -1;
+    }
+    #filter-panel:not(.filter-horizontal) .filter-values-list .filter-value-search-inline { display: none; }
+    #filter-panel.filter-horizontal .filter-value-search-inline input {
+      font-size: 11px !important;
+      padding: 6px 8px 6px 26px !important;
+    }
+    #filter-panel.filter-horizontal .filter-value-search-inline .lov-search-icon {
+      left: 8px;
+      font-size: 11px;
     }
 
     /* ===== Off-canvas Filter By button ===== */
@@ -381,6 +398,10 @@
       overflow-y: auto;
       overflow-x: hidden;
       padding-right: 4px;
+    }
+    /* Off-canvas (vertical) value list should not show a container border */
+    #offcanvas-modal #filter-panel:not(.filter-horizontal) .filter-values-list {
+      border: none !important;
     }
     #filter-panel:not(.filter-horizontal) .filter-option {
       display: flex;
@@ -1844,6 +1865,7 @@
 
     // Filter layout (horizontal vs sidebar)
     applyFilterLayout(c);
+    ensureInlineFilterSearch();
 
     initFilterDropdowns();
     
@@ -2003,6 +2025,22 @@
     }
   }
 
+  function ensureInlineFilterSearch() {
+    document.querySelectorAll('.filter-section').forEach(section => {
+      const list = section.querySelector('.filter-values-list');
+      if (!list || list.querySelector('.filter-value-search-inline')) return;
+      const base = section.querySelector('.filter-value-search');
+      const wrap = document.createElement('div');
+      wrap.className = 'filter-value-search filter-value-search-inline lov-search';
+      wrap.innerHTML = '<i class="fas fa-search lov-search-icon"></i><input type="text" placeholder="Search filter value" aria-label="Search filter value">';
+      const baseInput = base ? base.querySelector('input') : null;
+      if (baseInput && baseInput.placeholder) {
+        wrap.querySelector('input').placeholder = baseInput.placeholder;
+      }
+      list.prepend(wrap);
+    });
+  }
+
   function openOffcanvasModal() {
     const modal = document.getElementById('offcanvas-modal');
     const overlay = document.getElementById('offcanvas-overlay');
@@ -2115,10 +2153,11 @@
         clearProp(el, 'border-color');
       }
     });
-    document.querySelectorAll('#filter-panel.filter-horizontal .filter-values-list').forEach(el => {
-      if (isHorizontal && optBg) setI(el, 'background-color', optBg);
+    document.querySelectorAll('.filter-values-list').forEach(el => {
+      const inHorizontal = !!el.closest('#filter-panel.filter-horizontal');
+      if (isHorizontal && inHorizontal && optBg) setI(el, 'background-color', optBg);
       else clearProp(el, 'background-color');
-      if (isHorizontal) {
+      if (isHorizontal && inHorizontal) {
         setI(el, 'border-width', '1px');
         setI(el, 'border-style', 'solid');
         setI(el, 'border-color', c.optLabelColor || '#e5e7eb');
@@ -2168,14 +2207,14 @@
 
 
     // ---- Search bars (Collection + per-filter-value): only text/icon follow
-    // the Filter Value color. The input border stays neutral gray so it never
-    // looks like a heavy outer frame around the values list.
+    // the Filter Value color. The input border is a clear black for visibility.
     const searchColor = c.valColor || '#374151';
     document.querySelectorAll('.lov-search').forEach(wrap => {
       wrap.style.setProperty('--lov-search-color', '#e5e7eb');
+      wrap.style.setProperty('--lov-search-border', '#111827');
     });
     document.querySelectorAll('.lov-search input').forEach(inp => {
-      setI(inp, 'border-color', '#e5e7eb');
+      setI(inp, 'border-color', '#111827');
       setI(inp, 'color', searchColor);
       if (c.valFont) setI(inp, 'font-family', c.valFont);
     });
